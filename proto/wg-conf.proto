@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.grpc.wg-conf.registration";
+option java_outer_classname = "RegisterProto";
+
+package registration;
+
+
+// The greeting service definition.
+service Registration {
+    // Sends a greeting
+    rpc RegisterClient (RegisterRequest) returns (RegisterReply) {}
+}
+
+message RegisterRequest {
+    string public_key = 1;
+}
+
+message RegisterReply {
+    string public_key = 1;
+    string ip_address = 2;
+}

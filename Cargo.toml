@@ -1,0 +1,19 @@
+[package]
+name = "wg-conf"
+version = "0.1.0"
+authors = ["dan"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tonic = "0.2.0"
+prost = "0.6"
+tokio = { version = "0.2", features = ["rt-threaded", "time", "stream", "fs", "macros", "uds"] }
+futures = { version = "0.3", default-features = false, features = ["alloc"] }
+clap = "2.33"
+log = "0.4"
+pretty_env_logger = "0.4"
+
+[build-dependencies]
+tonic-build = "0.2"
