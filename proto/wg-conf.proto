@@ -19,5 +19,6 @@ message RegisterRequest {
 
 message RegisterReply {
     string public_key = 1;
-    string ip_address = 2;
+    string ipv4_address = 2;
+    string ipv6_address = 3;
 }

@@ -2,6 +2,8 @@ pub mod client;
 pub mod server;
 
 extern crate pretty_env_logger;
+extern crate ini;
+extern crate ipnetwork;
 #[macro_use]
 extern crate log;
 extern crate clap;
@@ -27,6 +29,7 @@ fn main() {
                 Arg::with_name("endpoint")
                     .short("h")          
                     .required(true)      
+                    .default_value("http://localhost:50051")
                     .help("Server endpoint to connect to")
                     .takes_value(true),
             )
@@ -35,6 +38,7 @@ fn main() {
             SubCommand::with_name("server").arg(
                 Arg::with_name("port")
                     .short("p")
+                    .default_value("50051")
                     .help("port to listen on")
                     .takes_value(true),
             ),

@@ -1,10 +1,15 @@
 use registration::registration_server::{Registration, RegistrationServer};
 use registration::{RegisterReply, RegisterRequest};
 use tonic::{transport::Server, Request, Response, Status};
+use backend::WireguardConfig;
 
 pub mod registration {
     tonic::include_proto!("registration");
 }
+
+pub mod backend;
+
+const CONF_FILE_NAME: &str = "test.ini";
 
 #[derive(Debug, Default)]
 pub struct WgRegistration {}
@@ -17,9 +22,12 @@ impl Registration for WgRegistration {
     ) -> Result<Response<RegisterReply>, Status> {
         println!("Got a request: {:?}", request);
 
+        let config = WireguardConfig::new(CONF_FILE_NAME);
+        
         let reply = registration::RegisterReply {
-            public_key: "123456".into(),
-            ip_address: "23456".into(),
+            public_key: config.get_public_key(),
+            ipv4_address: format!("{}", config.get_ipv4().unwrap()),
+            ipv6_address: format!("{}", config.get_ipv6().unwrap()),
         };
 
         Ok(Response::new(reply))
