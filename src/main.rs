@@ -7,6 +7,7 @@ extern crate ipnetwork;
 #[macro_use]
 extern crate log;
 extern crate clap;
+extern crate x25519_dalek;
 use clap::{App, Arg, SubCommand, AppSettings};
 use client::start_client;
 use server::start_server;

@@ -2,7 +2,6 @@ use ini::Ini;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use ipnetwork::{Ipv4Network, Ipv6Network};
 use memory::MemoryBackend;
-use std::sync::Arc;
 
 pub mod memory;
 
@@ -11,7 +10,7 @@ pub struct WireguardConfig {
     ini: Ini,
     adresses: Vec<String>,
     public_key: String,
-    backend: Arc<dyn StorageBackend>
+    backend: Box<dyn StorageBackend>
 }
 
 impl WireguardConfig {
@@ -24,23 +23,23 @@ impl WireguardConfig {
             ini: i.clone(),
             adresses: section.get("Address").unwrap().split(',').map(|addr| addr.into() ).collect::<Vec<String>>().into(),
             public_key: "123456".into(),
-            backend: Arc::new(backend)
+            backend: Box::new(backend)
         };
         return conf;
     }
 
     pub fn get_ipv4(&self, key: String) -> Result<Ipv4Addr, String> {
         let mut err_result = "Ip not found".into();
+        if let Some(ip) = self.backend.retrieve_ipv4(&key) {
+            return Ok(ip);
+        }
         for addr in &self.adresses {
             println!("Address={}", addr.trim());
             let net_option: Result<Ipv4Network,_ > = addr.parse();
             let ipv4_len = self.backend.get_ipv4_size();
             println!("backend size: {}", ipv4_len);
             match net_option {
-                Ok(net) => {               
-                    if let Some(ip) = self.backend.retrieve_ipv4(&key) {
-                        return Ok(ip);
-                    }
+                Ok(net) => {                                   
                     let next = net.nth(ipv4_len + 1).unwrap(); 
                     self.backend.store_ipv4(key, next);
                     println!("Network Size={}", net.size());
