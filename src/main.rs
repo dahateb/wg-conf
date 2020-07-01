@@ -8,6 +8,8 @@ extern crate ipnetwork;
 extern crate log;
 extern crate clap;
 extern crate x25519_dalek;
+extern crate base64;
+
 use clap::{App, Arg, SubCommand, AppSettings};
 use client::start_client;
 use server::start_server;

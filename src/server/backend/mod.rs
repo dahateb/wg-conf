@@ -2,8 +2,10 @@ use ini::Ini;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use ipnetwork::{Ipv4Network, Ipv6Network};
 use memory::MemoryBackend;
+use crypto::get_public_key;
 
 pub mod memory;
+pub mod crypto;
 
 
 pub struct WireguardConfig {
@@ -18,11 +20,12 @@ impl WireguardConfig {
     pub fn new(ini_file: &str) -> WireguardConfig{
         let i: Ini = Ini::load_from_file(ini_file).unwrap();
         let section = i.section(Some("Interface")).unwrap();
+        let private_key = section.get("PrivateKey");
         let backend = MemoryBackend::new();
         let conf = WireguardConfig {
             ini: i.clone(),
             adresses: section.get("Address").unwrap().split(',').map(|addr| addr.into() ).collect::<Vec<String>>().into(),
-            public_key: "123456".into(),
+            public_key: get_public_key(private_key.unwrap()),
             backend: Box::new(backend)
         };
         return conf;
