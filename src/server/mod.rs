@@ -1,7 +1,7 @@
+use backend::WireguardConfig;
 use registration::registration_server::{Registration, RegistrationServer};
 use registration::{RegisterReply, RegisterRequest};
 use tonic::{transport::Server, Request, Response, Status};
-use backend::WireguardConfig;
 
 pub mod registration {
     tonic::include_proto!("registration");
@@ -12,17 +12,15 @@ pub mod backend;
 const CONF_FILE_NAME: &str = "test.ini";
 
 pub struct WgRegistration {
-    config: WireguardConfig
+    config: WireguardConfig,
 }
 
 impl WgRegistration {
-
     pub fn new() -> WgRegistration {
         WgRegistration {
-            config: WireguardConfig::new(CONF_FILE_NAME)
+            config: WireguardConfig::new(CONF_FILE_NAME),
         }
     }
-
 }
 
 #[tonic::async_trait]

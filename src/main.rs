@@ -1,16 +1,17 @@
 pub mod client;
 pub mod server;
 
-extern crate pretty_env_logger;
 extern crate ini;
 extern crate ipnetwork;
+extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
-extern crate clap;
-extern crate x25519_dalek;
 extern crate base64;
+extern crate clap;
+extern crate rand_core;
+extern crate x25519_dalek;
 
-use clap::{App, Arg, SubCommand, AppSettings};
+use clap::{App, AppSettings, Arg, SubCommand};
 use client::start_client;
 use server::start_server;
 
@@ -19,23 +20,17 @@ fn main() {
     let matches = App::new("wg-conf")
         .version("0.0.1")
         .author("Dan H. ")
-        .about("ip config tool for wireguard")        
+        .about("ip config tool for wireguard")
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .subcommand(
             SubCommand::with_name("client").arg(
-                Arg::with_name("client_public_key")
-                    .short("k")          
-                    .required(true)      
-                    .help("Public key of the client")
-                    .takes_value(true),
-            ).arg(
                 Arg::with_name("endpoint")
-                    .short("h")          
-                    .required(true)      
+                    .short("h")
+                    .required(true)
                     .default_value("http://localhost:50051")
                     .help("Server endpoint to connect to")
                     .takes_value(true),
-            )
+            ),
         )
         .subcommand(
             SubCommand::with_name("server").arg(
@@ -50,13 +45,12 @@ fn main() {
 
     match matches.subcommand() {
         ("client", Some(matches)) => {
-            let public_key = matches.value_of("client_public_key").unwrap();
             let endpoint = matches.value_of("endpoint").unwrap();
-            match start_client(endpoint, public_key) {
+            match start_client(endpoint) {
                 Err(err) => error!("{}", err),
                 _ => (),
             }
-        },
+        }
         ("server", Some(matches)) => {
             let port = matches.value_of("port").unwrap_or("50051");
             match start_server("0.0.0.0", port) {
@@ -64,6 +58,6 @@ fn main() {
                 _ => (),
             }
         }
-        _ => ()
+        _ => (),
     }
 }

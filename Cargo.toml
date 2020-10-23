@@ -14,10 +14,11 @@ futures = { version = "0.3", default-features = false, features = ["alloc"] }
 clap = "2.33"
 log = "0.4"
 pretty_env_logger = "0.4"
-rust-ini = "0.15.2"
+rust-ini = "0.16"
 ipnetwork = "0.16.0"
-x25519-dalek = "0.6"
+x25519-dalek = "1.1.0"
 base64 = "0.12.3"
+rand_core = "*"
 
 [build-dependencies]
 tonic-build = "0.2"
