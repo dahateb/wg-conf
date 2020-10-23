@@ -7,7 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tonic = "0.2.0"
+tonic = "0.3"
 prost = "0.6"
 tokio = { version = "0.2", features = ["rt-threaded", "time", "stream", "fs", "macros", "uds"] }
 futures = { version = "0.3", default-features = false, features = ["alloc"] }
@@ -15,10 +15,10 @@ clap = "2.33"
 log = "0.4"
 pretty_env_logger = "0.4"
 rust-ini = "0.16"
-ipnetwork = "0.16.0"
+ipnetwork = "0.17"
 x25519-dalek = "1.1.0"
-base64 = "0.12.3"
+base64 = "0.13"
 rand_core = "*"
 
 [build-dependencies]
-tonic-build = "0.2"
+tonic-build = "0.3"

@@ -14,12 +14,23 @@ pub struct WireguardConfig {
     backend: Box<dyn StorageBackend>,
 }
 
+// @TODO add write to config here
 impl WireguardConfig {
     pub fn new(ini_file: &str) -> WireguardConfig {
         let i: Ini = Ini::load_from_file(ini_file).unwrap();
         let section = i.section(Some("Interface")).unwrap();
         let private_key = section.get("PrivateKey");
+        let peers = i.section_all(Some("Peer"));
         let backend = MemoryBackend::new();
+        
+        for peer in peers {
+            println!("{:?}", peer);
+            let public_key = peer.get("PublicKey").unwrap();
+            let allowed_ip: Result<Ipv4Addr, _>  = peer.get("AllowedIPs").unwrap().parse();
+            backend.store_ipv4(public_key.into(), allowed_ip.unwrap());
+        }
+                
+        
         let conf = WireguardConfig {
             ini: i.clone(),
             adresses: section
