@@ -1,7 +1,7 @@
 use super::StorageBackend;
 use std::collections::HashMap;
 use std::convert::TryInto;
-use std::net::{Ipv4Addr, Ipv6Addr};
+use std::net::{Ipv4Addr};
 use std::sync::Arc;
 use std::sync::Mutex;
 
