@@ -71,7 +71,7 @@ impl WireguardConfig {
             let mut ini = self.ini.lock().unwrap();
             let mut props = Properties::new();
             props.insert("PublicKey", key);
-            props.insert::<&str, String>("AllowedIPs", result.ipv4_addr.to_string());
+            props.insert::<&str, String>("AllowedIPs", result.ipv4_addr.to_string() + "/32");
             match ini.entry(Some("Peer".into())) {
                 SectionEntry::Vacant(vac) => {
                     vac.insert(props);
