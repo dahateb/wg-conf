@@ -13,12 +13,14 @@ const CONF_FILE_NAME: &str = "test.ini";
 
 pub struct WgRegistration {
     config: WireguardConfig,
+    wg_port: String,
 }
 
 impl WgRegistration {
-    pub fn new() -> WgRegistration {
+    pub fn new(wg_port: &str) -> WgRegistration {
         WgRegistration {
             config: WireguardConfig::new(CONF_FILE_NAME),
+            wg_port: wg_port.into(),
         }
     }
 }
@@ -37,16 +39,21 @@ impl Registration for WgRegistration {
             public_key: registration.public_key,
             ipv4_address: format!("{}", registration.ipv4_addr),
             ipv6_address: format!("{}", registration.ipv6_addr),
+            wg_port: self.wg_port.clone(),
         };
         Ok(Response::new(reply))
     }
 }
 
 #[tokio::main]
-pub async fn start_server(ip: &str, port: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn start_server(
+    ip: &str,
+    port: &str,
+    wg_port: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
     info!("starting server on port {}", port);
     let addr = format!("{}:{}", ip, port).parse().unwrap();
-    let registration = WgRegistration::new();
+    let registration = WgRegistration::new(wg_port);
     Server::builder()
         .add_service(RegistrationServer::new(registration))
         .serve(addr)

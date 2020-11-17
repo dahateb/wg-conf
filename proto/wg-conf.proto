@@ -21,4 +21,5 @@ message RegisterReply {
     string public_key = 1;
     string ipv4_address = 2;
     string ipv6_address = 3;
+    string wg_port = 4;
 }

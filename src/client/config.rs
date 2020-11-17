@@ -1,6 +1,9 @@
-use base64::{encode};
+use base64::encode;
 use ini::Ini;
+use ipnetwork::Ipv4Network;
 use rand_core::OsRng;
+use std::net::Ipv4Addr;
+use url::Url;
 use x25519_dalek::{PublicKey, StaticSecret};
 
 pub fn build_config_file(
@@ -8,17 +11,24 @@ pub fn build_config_file(
     private_key: &str,
     peer_endpoint: &str,
     peer_public_key: &str,
-) {
+    wg_port: &str,
+    netmask: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let ipv4_addr: Ipv4Addr = address.parse()?;
+    let netmask_int = netmask.parse()?;
+    let ipv4_network = Ipv4Network::new(ipv4_addr, netmask_int)?;
+    let peer_url: Url = peer_endpoint.parse()?;
+    let peer_host = peer_url.host().unwrap();
     let mut conf = Ini::new();
     conf.with_section(Some("Interface"))
         .set("Address", address)
         .set("PrivateKey", private_key);
     conf.with_section(Some("Peer"))
-        .set("Endpoint", peer_endpoint)
+        .set("Endpoint", format!("{}:{}", peer_host, wg_port))
         .set("PublicKey", peer_public_key)
-        // add network address here
-        .set("AllowedIps", "10.80.0.0/24");
+        .set("AllowedIps", format!("{}", ipv4_network));
     conf.write_to_file("conf.ini").unwrap();
+    Ok(())
 }
 
 pub fn generate_key_pair() -> (String, String) {

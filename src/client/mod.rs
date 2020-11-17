@@ -10,7 +10,7 @@ pub mod registration {
 pub mod config;
 
 #[tokio::main]
-pub async fn start_client(endpoint: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn start_client(endpoint: &str, netmask: &str) -> Result<(), Box<dyn std::error::Error>> {
     info!("client mode");
     let mut client = RegistrationClient::connect(endpoint.to_string()).await?;
     let (private_key, public_key) = generate_key_pair();
@@ -28,7 +28,9 @@ pub async fn start_client(endpoint: &str) -> Result<(), Box<dyn std::error::Erro
         private_key.as_str(),
         endpoint,
         &reply.public_key,
-    );
+        &reply.wg_port,
+        netmask,
+    )?;
 
     Ok(())
 }

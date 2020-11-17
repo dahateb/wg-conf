@@ -19,6 +19,7 @@ ipnetwork = "0.17"
 x25519-dalek = "1.1.0"
 base64 = "0.13"
 rand_core = "*"
+url = "2.2.0"
 
 [build-dependencies]
 tonic-build = "0.3"

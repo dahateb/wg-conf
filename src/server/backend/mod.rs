@@ -41,8 +41,8 @@ impl WireguardConfig {
         for peer in peers {
             println!("{:?}", peer);
             let public_key = peer.get("PublicKey").unwrap();
-            let allowed_ip: Result<Ipv4Addr, _> = peer.get("AllowedIPs").unwrap().parse();
-            backend.store_ipv4(public_key.into(), allowed_ip.unwrap());
+            let allowed_ip: Result<Ipv4Network, _> = peer.get("AllowedIPs").unwrap().parse();
+            backend.store_ipv4(public_key.into(), allowed_ip.unwrap().ip());
         }
 
         let conf = WireguardConfig {
