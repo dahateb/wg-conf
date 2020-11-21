@@ -18,7 +18,7 @@ jobs:
           command: |
             rustup run stable rustc --version --verbose
             rustup run stable cargo --version --verbose
-            rustup run stable cargo build -r
+            rustup run stable cargo build --release
 # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"
