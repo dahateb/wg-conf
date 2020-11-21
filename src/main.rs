@@ -59,6 +59,7 @@ fn main() {
                         .takes_value(true),
                 ),
         )
+        .version("0.0.1")
         .get_matches();
 
     match matches.subcommand() {
