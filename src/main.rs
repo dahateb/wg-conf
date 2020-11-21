@@ -16,6 +16,8 @@ use clap::{App, AppSettings, Arg, SubCommand};
 use client::start_client;
 use server::start_server;
 
+const VERSION: &str = "0.0.2";
+
 fn main() {
     pretty_env_logger::init();
     let matches = App::new("wg-conf")
@@ -65,7 +67,7 @@ fn main() {
                         .takes_value(true),
                 ),
         )
-        .version("0.0.1")
+        .version(VERSION)
         .get_matches();
 
     match matches.subcommand() {
