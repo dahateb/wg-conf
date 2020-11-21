@@ -49,7 +49,7 @@ jobs:
             VERSION=$(/home/circleci/project/target/release/wg-conf --version | sed 's/ /_/g')
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} \
                 -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} \
-                -delete ${VERSION} /home/circleci/project/target/release/wg-conf
+                -delete ${VERSION} ${VERSION} /home/circleci/project/target/release/wg-conf
 # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"
