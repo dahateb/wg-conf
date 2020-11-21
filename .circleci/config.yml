@@ -11,9 +11,8 @@ jobs:
       - image: cimg/rust:1.48
     environment:
       TZ: "/usr/share/zoneinfo/Europe/Paris"
+    working_directory: /home/circleci/project
     steps:
-      - attach_workspace:
-          at: ./artifacts
       - checkout
       - run:
           name: Install stable toolchain
@@ -27,17 +26,18 @@ jobs:
       - persist_to_workspace:
           # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is 
           # taken to be the root directory of the workspace.
-          root: ./artifacts
+          root: /home/circleci/project
           # Must be relative path from root
           paths:
             - target/release
   publish-github-release:
     docker:
       - image: cibuilds/github:0.10
+    working_directory: /home/circleci/project
     steps:
       - attach_workspace:
-          at: ./artifacts
-      - run: ls -al ./artifacts
+          at: /home/circleci/project
+      - run: ls -al /home/circleci/project
 #      - run:
 #          name: "Publish Release on GitHub"
 #          command: |
