@@ -8,7 +8,7 @@ jobs:
       # your own using the Dockerfile provided below
       # and replace here. I put my own image here for
       # the example.
-      - image: circleci/rust:latest
+      - image: cimg/rust:1.48
     environment:
       TZ: "/usr/share/zoneinfo/Europe/Paris"
     steps:
