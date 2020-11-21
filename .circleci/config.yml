@@ -14,6 +14,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install stable toolchain
+          command: rustup toolchain install stable
+      - run:
           name: Stable Build
           command: |
             rustup run stable rustc --version --verbose
