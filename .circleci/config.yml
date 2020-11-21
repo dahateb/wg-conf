@@ -38,11 +38,13 @@ jobs:
       - attach_workspace:
           at: /home/circleci/project
       - run: ls -al /home/circleci/project/target/release
-#      - run:
-#          name: "Publish Release on GitHub"
-#          command: |
-#            VERSION=$(my-binary --version)
-#            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            VERSION=$(/home/circleci/project/target/release/wg-conf --version)
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} |
+                -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} |
+                -delete ${VERSION} /home/circleci/project/target/release/wg-conf
 # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"
