@@ -32,7 +32,7 @@ jobs:
             - target/release
   publish-github-release:
     docker:
-      - image: circleci/golang:1.8
+      - image: cimg/go:1.15
     working_directory: /home/circleci/project
     steps:
       - attach_workspace:
