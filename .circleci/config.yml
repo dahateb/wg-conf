@@ -12,6 +12,8 @@ jobs:
     environment:
       TZ: "/usr/share/zoneinfo/Europe/Paris"
     steps:
+      - attach_workspace:
+          at: ./artifacts
       - checkout
       - run:
           name: Install stable toolchain
@@ -22,10 +24,30 @@ jobs:
             rustup run stable rustc --version --verbose
             rustup run stable cargo --version --verbose
             rustup run stable cargo build --release
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is 
+          # taken to be the root directory of the workspace.
+          root: ./artifacts
+          # Must be relative path from root
+          paths:
+            - target/release
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - attach_workspace:
+          at: ./artifacts
+      - run: ls -al ./artifacts
+#      - run:
+#          name: "Publish Release on GitHub"
+#          command: |
+#            VERSION=$(my-binary --version)
+#            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 # Orchestrate or schedule a set of jobs
 workflows:
   # Name the workflow "welcome"
-  welcome:
+  build-and-release:
     # Run the welcome/run job in its own container
     jobs:
       - build
+      - publish-github-release
