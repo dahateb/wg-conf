@@ -9,17 +9,15 @@ pub mod registration {
 
 pub mod backend;
 
-const CONF_FILE_NAME: &str = "test.ini";
-
 pub struct WgRegistration {
     config: WireguardConfig,
     wg_port: String,
 }
 
 impl WgRegistration {
-    pub fn new(wg_port: &str) -> WgRegistration {
+    pub fn new(wg_port: &str, config_file: &str) -> WgRegistration {
         WgRegistration {
-            config: WireguardConfig::new(CONF_FILE_NAME),
+            config: WireguardConfig::new(config_file),
             wg_port: wg_port.into(),
         }
     }
@@ -50,10 +48,11 @@ pub async fn start_server(
     ip: &str,
     port: &str,
     wg_port: &str,
+    config_file: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
     info!("starting server on port {}", port);
     let addr = format!("{}:{}", ip, port).parse().unwrap();
-    let registration = WgRegistration::new(wg_port);
+    let registration = WgRegistration::new(wg_port, config_file);
     Server::builder()
         .add_service(RegistrationServer::new(registration))
         .serve(addr)

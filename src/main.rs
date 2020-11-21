@@ -57,6 +57,12 @@ fn main() {
                         .default_value("51820")
                         .help("port wireguard to listens on")
                         .takes_value(true),
+                )
+                .arg(
+                    Arg::with_name("config_file")
+                        .default_value("test.ini")
+                        .help("config file for wg-quick")
+                        .takes_value(true),
                 ),
         )
         .version("0.0.1")
@@ -74,7 +80,8 @@ fn main() {
         ("server", Some(matches)) => {
             let port = matches.value_of("port").unwrap_or("50051");
             let wg_port = matches.value_of("wg_port").unwrap_or("51820");
-            match start_server("0.0.0.0", port, wg_port) {
+            let config_file = matches.value_of("config_file").unwrap_or("test.ini");
+            match start_server("0.0.0.0", port, wg_port, config_file) {
                 Err(err) => error!("{}", err),
                 _ => (),
             }
