@@ -37,7 +37,11 @@ jobs:
     steps:
       - attach_workspace:
           at: /home/circleci/project
-      - run: ls -al /home/circleci/project/target/release
+      - run:
+          name: make file executable 
+          command: |
+            ls -al /home/circleci/project/target/release
+            chmod +x /home/circleci/project/target/release/wg-conf
       - run:
           name: "Publish Release on GitHub"
           command: |
