@@ -18,7 +18,7 @@ pub struct WireguardConfig {
 
 pub struct RegisterResult {
     pub ipv4_addr: Ipv4Addr,
-    pub ipv6_addr: Ipv6Addr,
+    pub ipv6_addr: Option<Ipv6Addr>,
     pub public_key: String,
 }
 
@@ -32,6 +32,7 @@ impl WireguardConfig {
                 enabled_escape: true,
             },
         )
+        .map_err(|e| format!("Error loading ini file {} : {}", ini_file, e))
         .unwrap();
         let section = i.section(Some("Interface")).unwrap();
         let private_key = section.get("PrivateKey");
@@ -58,13 +59,14 @@ impl WireguardConfig {
             public_key: get_public_key(private_key.unwrap()),
             backend: Box::new(backend),
         };
+        println!("{:?}", conf.adresses);
         return conf;
     }
 
     pub fn register(&self, key: String) -> Result<RegisterResult, String> {
         let result = RegisterResult {
             ipv4_addr: self.get_ipv4(key.clone())?,
-            ipv6_addr: self.get_ipv6()?,
+            ipv6_addr: self.get_ipv6().ok(),
             public_key: self.public_key.clone(),
         };
         {
@@ -92,7 +94,7 @@ impl WireguardConfig {
             return Ok(ip);
         }
         for addr in &self.adresses {
-            println!("Address={}", addr.trim());
+            println!("Local Address={}", addr.trim());
             let net_option: Result<Ipv4Network, _> = addr.parse();
             let ipv4_len = self.backend.get_ipv4_size();
             println!("backend size: {}", ipv4_len);
@@ -123,7 +125,7 @@ impl WireguardConfig {
                     println!("2nd={}", net.iter().next().unwrap());
                     return Ok(net.iter().next().unwrap());
                 }
-                Err(err) => err_result = format!("ip parse Error: {}", err),
+                Err(err) => err_result = format!("ipv6 parse Error: {}", err),
             }
         }
         return Err(err_result);

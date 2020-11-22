@@ -16,7 +16,7 @@ use clap::{App, AppSettings, Arg, SubCommand};
 use client::start_client;
 use server::start_server;
 
-const VERSION: &str = "0.0.2";
+const VERSION: &str = "0.0.3";
 
 fn main() {
     pretty_env_logger::init();
@@ -54,14 +54,15 @@ fn main() {
                         .takes_value(true),
                 )
                 .arg(
-                    Arg::with_name("wg_port")
+                    Arg::with_name("wg-port")
                         .short("w")
                         .default_value("51820")
                         .help("port wireguard to listens on")
                         .takes_value(true),
                 )
                 .arg(
-                    Arg::with_name("config_file")
+                    Arg::with_name("config-file")
+                        .long("config-file")
                         .default_value("test.ini")
                         .help("config file for wg-quick")
                         .takes_value(true),
@@ -81,8 +82,8 @@ fn main() {
         }
         ("server", Some(matches)) => {
             let port = matches.value_of("port").unwrap_or("50051");
-            let wg_port = matches.value_of("wg_port").unwrap_or("51820");
-            let config_file = matches.value_of("config_file").unwrap_or("test.ini");
+            let wg_port = matches.value_of("wg-port").unwrap_or("51820");
+            let config_file = matches.value_of("config-file").unwrap_or("test.ini");
             match start_server("0.0.0.0", port, wg_port, config_file) {
                 Err(err) => error!("{}", err),
                 _ => (),
