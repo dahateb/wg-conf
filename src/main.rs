@@ -16,12 +16,12 @@ use clap::{App, AppSettings, Arg, SubCommand};
 use client::start_client;
 use server::start_server;
 
-const VERSION: &str = "0.0.3";
+const VERSION: &str = "0.0.4";
 
 fn main() {
     pretty_env_logger::init();
     let matches = App::new("wg-conf")
-        .version("0.0.1")
+        .version(VERSION)
         .author("Dan H. ")
         .about("ip config tool for wireguard")
         .setting(AppSettings::SubcommandRequiredElseHelp)
@@ -41,6 +41,13 @@ fn main() {
                         .required(true)
                         .default_value("16")
                         .help("Netmask of the route to the VPN")
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::with_name("config-file")
+                        .long("config-file")
+                        .default_value("test.ini")
+                        .help("config file for wg-quick")
                         .takes_value(true),
                 ),
         )
@@ -63,7 +70,6 @@ fn main() {
                 .arg(
                     Arg::with_name("config-file")
                         .long("config-file")
-                        .default_value("test.ini")
                         .help("config file for wg-quick")
                         .takes_value(true),
                 ),
@@ -75,7 +81,8 @@ fn main() {
         ("client", Some(matches)) => {
             let endpoint = matches.value_of("endpoint").unwrap();
             let netmask = matches.value_of("netmask").unwrap();
-            match start_client(endpoint, netmask) {
+            let config_file = matches.value_of("config-file");
+            match start_client(endpoint, netmask, config_file) {
                 Err(err) => error!("{}", err),
                 _ => (),
             }

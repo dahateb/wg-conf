@@ -32,11 +32,14 @@ impl Registration for WgRegistration {
         println!("Got a request: {:?}", request);
 
         let client_public_key = request.into_inner().public_key;
-        let registration = self.config.register(client_public_key)
-        .map_err(|e| error!("{}", e)).unwrap();
+        let registration = self
+            .config
+            .register(client_public_key)
+            .map_err(|e| error!("{}", e))
+            .unwrap();
         let ipv6 = match registration.ipv6_addr {
             Some(addr) => format!("{}", addr),
-            None => String::new()
+            None => String::new(),
         };
         let reply = registration::RegisterReply {
             public_key: registration.public_key,

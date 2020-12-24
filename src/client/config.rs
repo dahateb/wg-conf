@@ -13,7 +13,9 @@ pub fn build_config_file(
     peer_public_key: &str,
     wg_port: &str,
     netmask: &str,
+    config_file: Option<&str>,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    let config_file_name = config_file.unwrap_or("conf.ini");
     let ipv4_addr: Ipv4Addr = address.parse()?;
     let netmask_int = netmask.parse()?;
     let ipv4_network = Ipv4Network::new(ipv4_addr, netmask_int)?;
@@ -27,7 +29,7 @@ pub fn build_config_file(
         .set("Endpoint", format!("{}:{}", peer_host, wg_port))
         .set("PublicKey", peer_public_key)
         .set("AllowedIps", format!("{}", ipv4_network));
-    conf.write_to_file("conf.ini").unwrap();
+    conf.write_to_file(config_file_name).unwrap();
     Ok(())
 }
 
