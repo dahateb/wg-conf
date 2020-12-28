@@ -6,17 +6,16 @@ extern crate ipnetwork;
 extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
-extern crate base64;
 extern crate clap;
-extern crate rand_core;
+extern crate crypto;
+extern crate hooks;
 extern crate url;
-extern crate x25519_dalek;
 
 use clap::{App, AppSettings, Arg, SubCommand};
 use client::start_client;
 use server::start_server;
 
-const VERSION: &str = "0.0.4";
+const VERSION: &str = "0.0.5";
 
 fn main() {
     pretty_env_logger::init();

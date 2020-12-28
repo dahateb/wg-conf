@@ -1,10 +1,8 @@
-use base64::encode;
 use ini::Ini;
 use ipnetwork::Ipv4Network;
-use rand_core::OsRng;
+
 use std::net::Ipv4Addr;
 use url::Url;
-use x25519_dalek::{PublicKey, StaticSecret};
 
 pub fn build_config_file(
     address: &str,
@@ -31,11 +29,4 @@ pub fn build_config_file(
         .set("AllowedIps", format!("{}", ipv4_network));
     conf.write_to_file(config_file_name).unwrap();
     Ok(())
-}
-
-pub fn generate_key_pair() -> (String, String) {
-    let secret = StaticSecret::new(OsRng);
-    let private_key = encode(secret.to_bytes());
-    let public_key = encode(PublicKey::from(&secret).as_bytes());
-    (private_key, public_key)
 }

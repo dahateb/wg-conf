@@ -1,11 +1,11 @@
-use crypto::get_public_key;
+use crate::crypto::get_public_key;
 use ini::{Ini, ParseOption, Properties, SectionEntry};
 use ipnetwork::{Ipv4Network, Ipv6Network};
 use memory::MemoryBackend;
 use std::net::{Ipv4Addr, Ipv6Addr};
-use std::sync::Mutex;
+//use std::sync::Mutex;
+use tokio::sync::Mutex;
 
-pub mod crypto;
 pub mod memory;
 
 pub struct WireguardConfig {
@@ -63,14 +63,14 @@ impl WireguardConfig {
         return conf;
     }
 
-    pub fn register(&self, key: String) -> Result<RegisterResult, String> {
+    pub async fn register(&self, key: String) -> Result<RegisterResult, String> {
         let result = RegisterResult {
             ipv4_addr: self.get_ipv4(key.clone())?,
             ipv6_addr: self.get_ipv6().ok(),
             public_key: self.public_key.clone(),
         };
         {
-            let mut ini = self.ini.lock().unwrap();
+            let mut ini = self.ini.lock().await;
             let mut props = Properties::new();
             props.insert("PublicKey", key);
             props.insert::<&str, String>("AllowedIPs", result.ipv4_addr.to_string() + "/32");

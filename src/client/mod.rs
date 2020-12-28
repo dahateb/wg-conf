@@ -1,7 +1,5 @@
-use crate::server::backend;
-
-use self::config::{build_config_file, generate_key_pair};
-use backend::crypto::get_public_key;
+use self::config::build_config_file;
+use crate::crypto::{generate_key_pair, get_public_key};
 use ini::{Ini, ParseOption};
 use registration::registration_client::RegistrationClient;
 use registration::RegisterReply;

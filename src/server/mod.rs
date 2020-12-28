@@ -1,4 +1,5 @@
 use backend::WireguardConfig;
+use hooks::RegistrationHooks;
 use registration::registration_server::{Registration, RegistrationServer};
 use registration::{RegisterReply, RegisterRequest};
 use tonic::{transport::Server, Request, Response, Status};
@@ -12,6 +13,7 @@ pub mod backend;
 pub struct WgRegistration {
     config: WireguardConfig,
     wg_port: String,
+    hooks: RegistrationHooks,
 }
 
 impl WgRegistration {
@@ -19,6 +21,7 @@ impl WgRegistration {
         WgRegistration {
             config: WireguardConfig::new(config_file),
             wg_port: wg_port.into(),
+            hooks: RegistrationHooks::new(),
         }
     }
 }
@@ -32,9 +35,11 @@ impl Registration for WgRegistration {
         println!("Got a request: {:?}", request);
 
         let client_public_key = request.into_inner().public_key;
+        // maybe move to non-blocking
         let registration = self
             .config
             .register(client_public_key)
+            .await
             .map_err(|e| error!("{}", e))
             .unwrap();
         let ipv6 = match registration.ipv6_addr {

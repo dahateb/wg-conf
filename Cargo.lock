@@ -131,6 +131,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "crypto"
+version = "0.0.1"
+dependencies = [
+ "base64 0.13.0",
+ "rand_core",
+ "x25519-dalek",
+]
+
+[[package]]
 name = "curve25519-dalek"
 version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -344,6 +353,10 @@ checksum = "8a0d737e0f947a1864e93d33fdef4af8445a00d1ed8dc0c8ddb73139ea6abf15"
 dependencies = [
  "libc",
 ]
+
+[[package]]
+name = "hooks"
+version = "0.1.0"
 
 [[package]]
 name = "http"
@@ -1324,22 +1337,21 @@ checksum = "cccddf32554fecc6acb585f82a32a72e28b48f8c4c1883ddfeeeaa96f7d8e519"
 
 [[package]]
 name = "wg-conf"
-version = "0.0.4"
+version = "0.0.5"
 dependencies = [
- "base64 0.13.0",
  "clap",
+ "crypto",
  "futures",
+ "hooks",
  "ipnetwork",
  "log",
  "pretty_env_logger",
  "prost",
- "rand_core",
  "rust-ini",
  "tokio",
  "tonic",
  "tonic-build",
  "url",
- "x25519-dalek",
 ]
 
 [[package]]
