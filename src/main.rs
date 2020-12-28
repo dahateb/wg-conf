@@ -44,6 +44,7 @@ fn main() {
                 )
                 .arg(
                     Arg::with_name("config-file")
+                        .short("c")
                         .long("config-file")
                         .default_value("test.ini")
                         .help("config file for wg-quick")
@@ -68,8 +69,21 @@ fn main() {
                 )
                 .arg(
                     Arg::with_name("config-file")
+                        .short("c")
                         .long("config-file")
                         .help("config file for wg-quick")
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::with_name("pre-register")
+                        .long("pre-register-script")
+                        .help("shell script before register")
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::with_name("post-register")
+                        .long("post-register-script")
+                        .help("shell script to run after register")
                         .takes_value(true),
                 ),
         )
@@ -90,7 +104,16 @@ fn main() {
             let port = matches.value_of("port").unwrap_or("50051");
             let wg_port = matches.value_of("wg-port").unwrap_or("51820");
             let config_file = matches.value_of("config-file").unwrap_or("test.ini");
-            match start_server("0.0.0.0", port, wg_port, config_file) {
+            let pre_register = matches.value_of("pre-register");
+            let post_register = matches.value_of("post-register");
+            match start_server(
+                "0.0.0.0",
+                port,
+                wg_port,
+                config_file,
+                pre_register,
+                post_register,
+            ) {
                 Err(err) => error!("{}", err),
                 _ => (),
             }

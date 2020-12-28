@@ -1,6 +1,6 @@
 pub struct RegistrationHooks {
-    pre_register: String,
-    post_register: String,
+    pub pre_register: String,
+    pub post_register: String,
 }
 
 impl RegistrationHooks {
@@ -11,11 +11,11 @@ impl RegistrationHooks {
         }
     }
 
-    pub async fn pre_register(self) {
+    pub async fn exec_pre_register(&self) {
         //self.pre_register
     }
 
-    pub async fn post_register(self) {}
+    pub async fn exec_post_register(&self) {}
 }
 
 #[cfg(test)]
