@@ -27,12 +27,18 @@ impl RegistrationHooks {
     async fn run(command: &str) -> Result<String, Box<dyn std::error::Error>> {
         let mut fmt_output = String::new();
         if command.len() > 0 {
-            let output = Command::new(command).output().await?;
-
-            if output.status.success() {
-                fmt_output.push_str(str::from_utf8(&output.stdout[..]).unwrap());
+            let output = if cfg!(target_os = "windows") {
+                Command::new("cmd").args(&["/C", command]).output().await?
             } else {
-                fmt_output.push_str(str::from_utf8(&output.stderr[..]).unwrap());
+                Command::new("sh").arg("-c").arg(command).output().await?
+            };
+            let stdout = unsafe { str::from_utf8_unchecked(&output.stdout[..]) };
+            let stderr = unsafe { str::from_utf8_unchecked(&output.stderr[..]) };
+            if output.status.success() {
+                fmt_output.push_str(stdout);
+            } else {
+                fmt_output.push_str(stderr);
+                fmt_output.push_str(stdout);
                 return Err(Box::new(HookError {
                     output: fmt_output,
                     exit_code: output.status.to_string(),
@@ -51,7 +57,7 @@ struct HookError {
 
 impl fmt::Display for HookError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_fmt(format_args!("Exitcode: {} {}", self.exit_code, self.output))
+        f.write_fmt(format_args!("{} {}", self.exit_code, self.output))
     }
 }
 

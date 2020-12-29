@@ -2,6 +2,7 @@ use config::WireguardConfig;
 use hooks::RegistrationHooks;
 use registration::registration_server::{Registration, RegistrationServer};
 use registration::{RegisterReply, RegisterRequest};
+use tonic::Code;
 use tonic::{transport::Server, Request, Response, Status};
 
 pub mod registration {
@@ -47,7 +48,14 @@ impl Registration for WgRegistration {
     ) -> Result<Response<RegisterReply>, Status> {
         println!("Got a request: {:?}", request);
         // pre register hook
-        self.hooks.exec_pre_register().await;
+        match self.hooks.exec_pre_register().await {
+            Ok(output) if output.len() > 0 => info!("{}", output),
+            Ok(_) => (),
+            Err(error) => {
+                error!("Pre Register Hook Fail: {}", error);
+                return Err(Status::new(Code::Internal, "Internal Server Error"));
+            }
+        }
         let client_public_key = request.into_inner().public_key;
         // maybe move to non-blocking
         let registration = self
@@ -67,7 +75,14 @@ impl Registration for WgRegistration {
             wg_port: self.wg_port.clone(),
         };
         // post register hook
-        self.hooks.exec_post_register().await;
+        match self.hooks.exec_post_register().await {
+            Ok(output) if output.len() > 0 => info!("{}", output),
+            Ok(_) => (),
+            Err(error) => {
+                error!("Post Register Hook Fail: {}", error);
+                return Err(Status::new(Code::Internal, "Internal Server Error"));
+            }
+        }
         Ok(Response::new(reply))
     }
 }
