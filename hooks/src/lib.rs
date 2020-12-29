@@ -15,12 +15,12 @@ impl RegistrationHooks {
 
     pub async fn exec_pre_register(&self) -> Result<String, Box<dyn std::error::Error>> {
         //self.pre_register
-        let output = RegistrationHooks::run(self.pre_register.as_str()).await?;
+        let output = RegistrationHooks::run(&self.pre_register).await?;
         Ok(output)
     }
 
     pub async fn exec_post_register(&self) -> Result<String, Box<dyn std::error::Error>> {
-        let output = RegistrationHooks::run(self.post_register.as_str()).await?;
+        let output = RegistrationHooks::run(&self.post_register).await?;
         Ok(output)
     }
 
@@ -32,13 +32,13 @@ impl RegistrationHooks {
             } else {
                 Command::new("sh").arg("-c").arg(command).output().await?
             };
-            let stdout = unsafe { str::from_utf8_unchecked(&output.stdout[..]) };
-            let stderr = unsafe { str::from_utf8_unchecked(&output.stderr[..]) };
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            let stderr = String::from_utf8_lossy(&output.stderr);
             if output.status.success() {
-                fmt_output.push_str(stdout);
+                fmt_output.push_str(&stdout);
             } else {
-                fmt_output.push_str(stderr);
-                fmt_output.push_str(stdout);
+                fmt_output.push_str(&stderr);
+                fmt_output.push_str(&stdout);
                 return Err(Box::new(HookError {
                     output: fmt_output,
                     exit_code: output.status.to_string(),
