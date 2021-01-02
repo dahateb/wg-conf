@@ -70,6 +70,8 @@ impl WireguardConfig {
         
         {
             let mut ini = self.ini.lock().await;
+            
+            //check if publickey is already registered
             let mut is_included = false;
             for peer in ini.section_all(Some("Peer")) {
                 debug!("{:?}", peer);
