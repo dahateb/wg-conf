@@ -107,14 +107,14 @@ impl WireguardConfig {
             println!("Local Address={}", addr.trim());
             let net_option: Result<Ipv4Network, _> = addr.parse();
             let ipv4_len = self.backend.get_ipv4_size();
-            println!("backend size: {}", ipv4_len);
+            debug!("backend size: {}", ipv4_len);
             match net_option {
                 Ok(net) => {
                     let next = net.nth(ipv4_len + 2).unwrap();
                     self.backend.store_ipv4(key, next);
-                    println!("Network Size={}", net.size());
-                    println!("IP={}", net.ip());
-                    println!("2nd={}", next);
+                    debug!("Network Size={}", net.size());
+                    debug!("IP={}", net.ip());
+                    debug!("2nd={}", next);
                     return Ok(next);
                 }
                 Err(err) => err_result = format!("ip parse Error: {}", err),
@@ -126,13 +126,13 @@ impl WireguardConfig {
     fn get_ipv6(&self) -> Result<Ipv6Addr, String> {
         let mut err_result = "Ip not found".into();
         for addr in &self.adresses {
-            println!("Address={}", addr.trim());
+            debug!("Address={}", addr.trim());
             let net_option: Result<Ipv6Network, _> = addr.trim().parse();
             match net_option {
                 Ok(net) => {
-                    println!("Network Size={}", net.size());
-                    println!("IP={}", net.ip());
-                    println!("2nd={}", net.iter().next().unwrap());
+                    debug!("Network Size={}", net.size());
+                    debug!("IP={}", net.ip());
+                    debug!("2nd={}", net.iter().next().unwrap());
                     return Ok(net.iter().next().unwrap());
                 }
                 Err(err) => err_result = format!("ipv6 parse Error: {}", err),
