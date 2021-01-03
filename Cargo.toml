@@ -17,7 +17,7 @@ futures = { version = "0.3", default-features = false, features = ["alloc"] }
 clap = "2.33"
 log = "0.4"
 pretty_env_logger = "0.4"
-rust-ini = "0.16"
+rust-ini = {git="https://github.com/dahateb/rust-ini"}
 ipnetwork = "0.17"
 url = "2.2.0"
 crypto = { path = "crypto" }

@@ -67,10 +67,10 @@ impl WireguardConfig {
             ipv6_addr: self.get_ipv6().ok(),
             public_key: self.public_key.clone(),
         };
-        
+
         {
             let mut ini = self.ini.lock().await;
-            
+
             //check if publickey is already registered
             let mut is_included = false;
             for peer in ini.section_all(Some("Peer")) {
@@ -80,7 +80,7 @@ impl WireguardConfig {
                 }
             }
             let mut props = Properties::new();
-            props.insert("PublicKey", key);
+            props.insert("PublicKey", key.clone());
             props.insert::<&str, String>("AllowedIPs", result.ipv4_addr.to_string() + "/32");
             match ini.entry(Some("Peer".into())) {
                 SectionEntry::Vacant(vac) => {
@@ -88,7 +88,15 @@ impl WireguardConfig {
                 }
                 SectionEntry::Occupied(mut occ) => {
                     if !is_included {
-                        occ.append(props);
+                        occ.append_or_update(props.clone(), |properties| {
+                            if properties.contains_key("PublicKey")
+                                && properties.get("PublicKey").unwrap() == key
+                            {
+                                *properties = props.clone();
+                                return true;
+                            }
+                            return false;
+                        });
                     }
                 }
             }

@@ -850,8 +850,7 @@ dependencies = [
 [[package]]
 name = "rust-ini"
 version = "0.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dcdbf249a931ceb503aa80e08ca016675dbc7884eda8e2d88e85533d4dbade62"
+source = "git+https://github.com/dahateb/rust-ini#66f6e37d553d6ddc9a75ce65a70b3c1c4b617d1d"
 dependencies = [
  "cfg-if 0.1.10",
  "ordered-multimap",
