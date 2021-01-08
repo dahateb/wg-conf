@@ -15,7 +15,7 @@ use clap::{App, AppSettings, Arg, SubCommand};
 use client::start_client;
 use server::start_server;
 
-const VERSION: &str = "0.0.6";
+const VERSION: &str = "0.0.7";
 
 fn main() {
     pretty_env_logger::init();
@@ -94,7 +94,9 @@ fn main() {
         ("client", Some(matches)) => {
             let endpoint = matches.value_of("endpoint").unwrap();
             let netmask = matches.value_of("netmask").unwrap();
-            let config_file = matches.value_of("config-file");
+            let config_file = matches
+                .value_of("config-file")
+                .unwrap_or("examples/conf/conf.ini");
             match start_client(endpoint, netmask, config_file) {
                 Err(err) => error!("{}", err),
                 _ => (),
@@ -103,7 +105,9 @@ fn main() {
         ("server", Some(matches)) => {
             let port = matches.value_of("port").unwrap_or("50051");
             let wg_port = matches.value_of("wg-port").unwrap_or("51820");
-            let config_file = matches.value_of("config-file").unwrap_or("test.ini");
+            let config_file = matches
+                .value_of("config-file")
+                .unwrap_or("examples/conf/test.ini");
             let pre_register = matches.value_of("pre-register");
             let post_register = matches.value_of("post-register");
             match start_server(

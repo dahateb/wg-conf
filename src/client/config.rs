@@ -13,7 +13,7 @@ pub fn build_config_file(
     netmask: &str,
     config_file: Option<&str>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let config_file_name = config_file.unwrap_or("conf.ini");
+    let config_file_name = config_file.unwrap_or("/etc/wireguard/wg0.conf");
     let ipv4_addr: Ipv4Addr = address.parse()?;
     let netmask_int = netmask.parse()?;
     let ipv4_network = Ipv4Network::new(ipv4_addr, netmask_int)?;
