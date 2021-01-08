@@ -13,6 +13,7 @@ extern crate url;
 
 #[macro_use]
 extern crate simple_error;
+extern crate http;
 
 use clap::{App, AppSettings, Arg, SubCommand};
 use client::start_client;
@@ -54,8 +55,8 @@ fn main() {
                         .takes_value(true),
                 )
                 .arg(
-                    Arg::with_name("ca-cert")                        
-                        .long("tls-ca-certificate")                    
+                    Arg::with_name("ca-cert")
+                        .long("tls-ca-certificate")
                         .help("root ca for use with tls")
                         .takes_value(true),
                 ),
@@ -100,7 +101,8 @@ fn main() {
                         .long("tls-certificate")
                         .help("Server certificate for use with tls")
                         .takes_value(true),
-                ).arg(
+                )
+                .arg(
                     Arg::with_name("tls-key")
                         .long("tls-private-key")
                         .help("Server private keyfor use with tls")
@@ -116,7 +118,7 @@ fn main() {
             let netmask = matches.value_of("netmask").unwrap();
             let config_file = matches.value_of("config-file");
             let ca_cert = matches.value_of("ca-cert");
-            match start_client(endpoint, netmask, config_file) {
+            match start_client(endpoint, netmask, config_file, ca_cert) {
                 Err(err) => error!("{}", err),
                 _ => (),
             }
@@ -130,7 +132,7 @@ fn main() {
             let pre_register = matches.value_of("pre-register");
             let post_register = matches.value_of("post-register");
             let server_tls_cert = matches.value_of("tls-cert");
-            let server_tls_key = matches.value_of("tls-key");            
+            let server_tls_key = matches.value_of("tls-key");
             match start_server(
                 "0.0.0.0",
                 port,
@@ -139,7 +141,7 @@ fn main() {
                 pre_register,
                 post_register,
                 server_tls_cert,
-                server_tls_key
+                server_tls_key,
             ) {
                 Err(err) => error!("{}", err),
                 _ => (),

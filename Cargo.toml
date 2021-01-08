@@ -23,6 +23,7 @@ url = "2.2.0"
 crypto = { path = "crypto" }
 hooks = { path = "hooks" }
 simple-error = "0.2.2"
+http = "0.2.3"
 
 [build-dependencies]
 tonic-build = "0.3"
