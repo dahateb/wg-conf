@@ -46,7 +46,7 @@ fn main() {
                     Arg::with_name("config-file")
                         .short("c")
                         .long("config-file")
-                        .default_value("test.ini")
+                        .default_value("examples/conf/conf.ini")
                         .help("config file for wg-quick")
                         .takes_value(true),
                 ),
@@ -94,9 +94,7 @@ fn main() {
         ("client", Some(matches)) => {
             let endpoint = matches.value_of("endpoint").unwrap();
             let netmask = matches.value_of("netmask").unwrap();
-            let config_file = matches
-                .value_of("config-file")
-                .unwrap_or("examples/conf/conf.ini");
+            let config_file = matches.value_of("config-file");
             match start_client(endpoint, netmask, config_file) {
                 Err(err) => error!("{}", err),
                 _ => (),
