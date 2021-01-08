@@ -11,6 +11,9 @@ extern crate crypto;
 extern crate hooks;
 extern crate url;
 
+#[macro_use]
+extern crate simple_error;
+
 use clap::{App, AppSettings, Arg, SubCommand};
 use client::start_client;
 use server::start_server;
@@ -49,6 +52,12 @@ fn main() {
                         .default_value("examples/conf/conf.ini")
                         .help("config file for wg-quick")
                         .takes_value(true),
+                )
+                .arg(
+                    Arg::with_name("ca-cert")                        
+                        .long("tls-ca-certificate")                    
+                        .help("root ca for use with tls")
+                        .takes_value(true),
                 ),
         )
         .subcommand(
@@ -85,6 +94,17 @@ fn main() {
                         .long("post-register-script")
                         .help("shell script to run after register")
                         .takes_value(true),
+                )
+                .arg(
+                    Arg::with_name("tls-cert")
+                        .long("tls-certificate")
+                        .help("Server certificate for use with tls")
+                        .takes_value(true),
+                ).arg(
+                    Arg::with_name("tls-key")
+                        .long("tls-private-key")
+                        .help("Server private keyfor use with tls")
+                        .takes_value(true),
                 ),
         )
         .version(VERSION)
@@ -95,6 +115,7 @@ fn main() {
             let endpoint = matches.value_of("endpoint").unwrap();
             let netmask = matches.value_of("netmask").unwrap();
             let config_file = matches.value_of("config-file");
+            let ca_cert = matches.value_of("ca-cert");
             match start_client(endpoint, netmask, config_file) {
                 Err(err) => error!("{}", err),
                 _ => (),
@@ -108,6 +129,8 @@ fn main() {
                 .unwrap_or("examples/conf/test.ini");
             let pre_register = matches.value_of("pre-register");
             let post_register = matches.value_of("post-register");
+            let server_tls_cert = matches.value_of("tls-cert");
+            let server_tls_key = matches.value_of("tls-key");            
             match start_server(
                 "0.0.0.0",
                 port,
@@ -115,6 +138,8 @@ fn main() {
                 config_file,
                 pre_register,
                 post_register,
+                server_tls_cert,
+                server_tls_key
             ) {
                 Err(err) => error!("{}", err),
                 _ => (),

@@ -10,7 +10,7 @@ edition = "2018"
 members = ["crypto", "hooks"]
 
 [dependencies]
-tonic = "0.3"
+tonic = {version = "0.3", features = ["tls"]}
 prost = "0.6"
 tokio = { version = "0.2", features = ["rt-threaded", "time", "stream", "fs", "macros", "uds"] }
 futures = { version = "0.3", default-features = false, features = ["alloc"] }
@@ -22,6 +22,7 @@ ipnetwork = "0.17"
 url = "2.2.0"
 crypto = { path = "crypto" }
 hooks = { path = "hooks" }
+simple-error = "0.2.2"
 
 [build-dependencies]
 tonic-build = "0.3"
