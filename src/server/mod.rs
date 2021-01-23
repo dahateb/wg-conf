@@ -1,6 +1,6 @@
+use auth::intercept;
 use config::WireguardConfig;
 use hooks::RegistrationHooks;
-use auth::intercept;
 use registration::registration_server::{Registration, RegistrationServer};
 use registration::{RegisterReply, RegisterRequest};
 use tonic::Code;
@@ -13,9 +13,9 @@ pub mod registration {
     tonic::include_proto!("registration");
 }
 
+pub mod auth;
 pub mod backend;
 pub mod config;
-pub mod auth;
 
 pub struct WgRegistration {
     config: WireguardConfig,
