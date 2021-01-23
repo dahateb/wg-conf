@@ -31,7 +31,7 @@ pub async fn start_client(
         let tls = ClientTlsConfig::new()
             .ca_certificate(ca)
             .domain_name(uri.host().unwrap());
-            println!("hier: {}", uri.host().unwrap());
+        debug!("Using tls for host: {}", uri.host().unwrap());
         Channel::builder(uri).tls_config(tls)?.connect().await?
     } else {
         Channel::builder(uri).connect().await?

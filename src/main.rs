@@ -19,7 +19,7 @@ use clap::{App, AppSettings, Arg, SubCommand};
 use client::start_client;
 use server::start_server;
 
-const VERSION: &str = "0.0.8";
+const VERSION: &str = "0.0.9";
 
 fn main() {
     pretty_env_logger::init();

@@ -1566,7 +1566,7 @@ dependencies = [
 
 [[package]]
 name = "wg-conf"
-version = "0.0.8"
+version = "0.0.9"
 dependencies = [
  "clap",
  "crypto",
