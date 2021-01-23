@@ -1,5 +1,6 @@
 use config::WireguardConfig;
 use hooks::RegistrationHooks;
+use auth::intercept;
 use registration::registration_server::{Registration, RegistrationServer};
 use registration::{RegisterReply, RegisterRequest};
 use tonic::Code;
@@ -14,6 +15,7 @@ pub mod registration {
 
 pub mod backend;
 pub mod config;
+pub mod auth;
 
 pub struct WgRegistration {
     config: WireguardConfig,
@@ -122,7 +124,8 @@ pub async fn start_server(
         info!("using tls");
         server = server.tls_config(ServerTlsConfig::new().identity(identity.unwrap()))?;
     }
-    let router = server.add_service(RegistrationServer::new(registration));
+    let service = RegistrationServer::with_interceptor(registration, intercept);
+    let router = server.add_service(service);
     router.serve(addr).await?;
     Ok(())
 }
