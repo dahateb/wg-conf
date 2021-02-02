@@ -1,6 +1,12 @@
 use tonic::{Request, Status};
 
-pub fn intercept(req: Request<()>) -> Result<Request<()>, Status> {
-    info!("Intercepting request: {:?}", req);
-    Ok(req)
+pub fn interceptor(
+    script_name: &'static str,
+) -> Box<dyn Fn(Request<()>) -> Result<Request<()>, Status> + Send + Sync + 'static> {     
+    //script auth currently not possible as interceptor is not async :(   
+    let intercept = move |req: Request<()>| {
+        info!("Calling {}, Intercepting request: {:?}", script_name, req);
+        Ok(req)
+    };
+    return Box::new(intercept);
 }

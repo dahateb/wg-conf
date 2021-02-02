@@ -159,6 +159,7 @@ fn main() {
                 .unwrap_or("examples/conf/test.ini");
             let pre_register = matches.value_of("pre-register");
             let post_register = matches.value_of("post-register");
+            let auth_script = matches.value_of("auth-script");
             let server_tls_cert = matches.value_of("tls-cert");
             let server_tls_key = matches.value_of("tls-key");
             match start_server(
@@ -168,6 +169,7 @@ fn main() {
                 config_file,
                 pre_register,
                 post_register,
+                auth_script,
                 server_tls_cert,
                 server_tls_key,
             ) {
