@@ -59,7 +59,29 @@ fn main() {
                         .long("tls-ca-certificate")
                         .help("root ca for use with tls")
                         .takes_value(true),
-                ),
+                )
+                .arg(
+                    Arg::with_name("auth-token")
+                        .long("auth-token")
+                        .help("Auth Token to send to server. If using single token auth")
+                        .conflicts_with_all(&["auth-user", "auth-password"])                        
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::with_name("auth-user")
+                        .long("auth-user")
+                        .help("Auth user to send to server. Use together with auth-password")
+                        .conflicts_with("auth-token")
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::with_name("auth-password")
+                        .long("auth-password")
+                        .help("Auth password to send to server")
+                        .conflicts_with("auth-token")
+                        .takes_value(true),
+                )
+                ,
         )
         .subcommand(
             SubCommand::with_name("server")
@@ -100,6 +122,12 @@ fn main() {
                     Arg::with_name("tls-cert")
                         .long("tls-certificate")
                         .help("Server certificate for use with tls")
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::with_name("auth-script")
+                        .long("auth-script")
+                        .help("shell script to validate auth info from client. Args will be passed as $1 $2")
                         .takes_value(true),
                 )
                 .arg(
