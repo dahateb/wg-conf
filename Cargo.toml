@@ -28,6 +28,8 @@ crypto = { path = "crypto" }
 hooks = { path = "hooks" }
 simple-error = "0.2.2"
 http = "0.2.3"
+hyper = "0.14"
+tower = { version = "0.4" }
 
 [build-dependencies]
 tonic-build = "0.4"
