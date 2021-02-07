@@ -22,9 +22,8 @@ impl RegistrationHooks {
     pub async fn exec_post_register(&self) -> Result<String, Box<dyn std::error::Error>> {
         let output = run(&self.post_register).await?;
         Ok(output)
-    }    
+    }
 }
-
 
 async fn run(command: &str) -> Result<String, Box<dyn std::error::Error>> {
     let mut fmt_output = String::new();

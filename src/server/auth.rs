@@ -1,12 +1,13 @@
-use tonic::{Request, Status, transport::{NamedService}, body::BoxBody,};
-use hyper::{Body, Request as HyperRequest, Response as HyperResponse};
-use tower::Service;
+use http::Request as HyperRequest;
+use hyper::{Body, Response as HyperResponse};
 use std::task::{Context, Poll};
+use tonic::{body::BoxBody, transport::NamedService, Request, Status};
+use tower::Service;
 
 pub fn interceptor(
     script_name: &'static str,
-) -> Box<dyn Fn(Request<()>) -> Result<Request<()>, Status> + Send + Sync + 'static> {     
-    //script auth currently not possible as interceptor is not async :(   
+) -> Box<dyn Fn(Request<()>) -> Result<Request<()>, Status> + Send + Sync + 'static> {
+    //script auth currently not possible as interceptor is not async :(
     let intercept = move |req: Request<()>| {
         info!("Calling {}, Intercepting request: {:?}", script_name, req);
         Ok(req)
@@ -14,14 +15,24 @@ pub fn interceptor(
     return Box::new(intercept);
 }
 
-async fn test() -> bool{
+async fn auth_check(auth_file_name: String) -> bool {
     return true;
 }
 
 // instead of interceptor to handle async function
 #[derive(Debug, Clone)]
-struct InterceptedService<S> {
+pub struct InterceptedService<S> {
     inner: S,
+    auth_script_file: Option<String>,
+}
+
+impl<S> InterceptedService<S> {
+    pub fn new(inner: S, auth_file_name: Option<String>) -> InterceptedService<S> {
+        InterceptedService {
+            inner: inner,
+            auth_script_file: auth_file_name,
+        }
+    }
 }
 
 impl<S> Service<HyperRequest<Body>> for InterceptedService<S>
@@ -43,15 +54,14 @@ where
 
     fn call(&mut self, req: HyperRequest<Body>) -> Self::Future {
         let mut svc = self.inner.clone();
-
+        let auth_file_script = self.auth_script_file.clone();
         Box::pin(async move {
             // Do async work here....
-            if test().await {
+            if auth_file_script.is_some() && auth_check(auth_file_script.unwrap()).await {
                 return Ok(http::Response::builder()
                     .status("401")
                     .body(tonic::body::BoxBody::empty())
-                    .unwrap()
-                );
+                    .unwrap());
             }
             svc.call(req).await
         })

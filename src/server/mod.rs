@@ -1,4 +1,4 @@
-use auth::interceptor;
+use auth::InterceptedService;
 use config::WireguardConfig;
 use hooks::RegistrationHooks;
 use registration::registration_server::{Registration, RegistrationServer};
@@ -125,12 +125,10 @@ pub async fn start_server(
         info!("using tls");
         server = server.tls_config(ServerTlsConfig::new().identity(identity.unwrap()))?;
     }
-    let service = if auth_script.is_some() {
-        let static_script = Box::leak(auth_script.unwrap().into());
-        RegistrationServer::with_interceptor(registration, interceptor(static_script))
-    } else {
-        RegistrationServer::new(registration)
-    };
+    let service = InterceptedService::new(
+        RegistrationServer::new(registration),
+        auth_script.map(|name| name.to_string()),
+    );
     let router = server.add_service(service);
     router.serve(addr).await?;
     Ok(())
