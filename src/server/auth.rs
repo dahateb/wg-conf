@@ -23,11 +23,11 @@ async fn auth_check(auth_file_name: String) -> bool {
 #[derive(Debug, Clone)]
 pub struct InterceptedService<S> {
     inner: S,
-    auth_script_file: Option<String>,
+    auth_script_file:String
 }
 
 impl<S> InterceptedService<S> {
-    pub fn new(inner: S, auth_file_name: Option<String>) -> InterceptedService<S> {
+    pub fn new(inner: S, auth_file_name: String) -> InterceptedService<S> {
         InterceptedService {
             inner: inner,
             auth_script_file: auth_file_name,
@@ -57,7 +57,7 @@ where
         let auth_file_script = self.auth_script_file.clone();
         Box::pin(async move {
             // Do async work here....
-            if auth_file_script.is_some() && auth_check(auth_file_script.unwrap()).await {
+            if auth_check(auth_file_script).await {
                 return Ok(http::Response::builder()
                     .status("401")
                     .body(tonic::body::BoxBody::empty())
