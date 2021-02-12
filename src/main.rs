@@ -71,6 +71,7 @@ fn main() {
                     Arg::with_name("auth-user")
                         .long("auth-user")
                         .help("Auth user to send to server. Use together with auth-password")
+                        .requires("auth-password")
                         .conflicts_with("auth-token")
                         .takes_value(true),
                 )
@@ -78,7 +79,8 @@ fn main() {
                     Arg::with_name("auth-password")
                         .long("auth-password")
                         .help("Auth password to send to server")
-                        .conflicts_with("auth-token")
+                        .requires("auth-user")
+                        .conflicts_with("auth-token")                        
                         .takes_value(true),
                 )
                 ,
@@ -146,7 +148,8 @@ fn main() {
             let netmask = matches.value_of("netmask").unwrap();
             let config_file = matches.value_of("config-file");
             let ca_cert = matches.value_of("ca-cert");
-            match start_client(endpoint, netmask, config_file, ca_cert) {
+            let auth_token = matches.value_of("auth-token");
+            match start_client(endpoint, netmask, config_file, ca_cert, auth_token) {
                 Err(err) => error!("{}", err),
                 _ => (),
             }

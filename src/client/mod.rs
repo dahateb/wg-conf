@@ -22,6 +22,7 @@ pub async fn start_client(
     netmask: &str,
     config_file: Option<&str>,
     ca_cert: Option<&str>,
+    auth_token: Option<&str>
 ) -> Result<(), Box<dyn std::error::Error>> {
     info!("client mode");
     let uri: Uri = endpoint.parse()?;
@@ -40,7 +41,7 @@ pub async fn start_client(
     };
     let (private_key, public_key) = get_keys(config_file);
 
-    let mut client = RegistrationClient::with_interceptor(channel, interceptor("script_name"));
+    let mut client = RegistrationClient::with_interceptor(channel, interceptor(auth_token.unwrap()));
     let request = tonic::Request::new(RegisterRequest {
         public_key: public_key,
     });    
