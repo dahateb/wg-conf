@@ -1,7 +1,7 @@
 use http::{HeaderValue, Request as HyperRequest};
 use hyper::{Body, Response as HyperResponse};
 use std::task::{Context, Poll};
-use tonic::{body::BoxBody, transport::NamedService, Request, Status, Code};
+use tonic::{body::BoxBody, transport::NamedService, Code, Request, Status};
 use tower::Service;
 
 pub fn interceptor(
@@ -23,7 +23,7 @@ async fn auth_check(auth_file_name: String, auth_header: HeaderValue) -> bool {
 #[derive(Debug, Clone)]
 pub struct InterceptedService<S> {
     inner: S,
-    auth_script_file:String
+    auth_script_file: String,
 }
 
 impl<S> InterceptedService<S> {
@@ -59,7 +59,7 @@ where
         Box::pin(async move {
             // Do async work here....
             if auth_header.is_none() || auth_check(auth_file_script, auth_header.unwrap()).await {
-                return Ok(Status::unauthenticated( "unauthorized").to_http());
+                return Ok(Status::unauthenticated("unauthorized").to_http());
             }
             svc.call(req).await
         })

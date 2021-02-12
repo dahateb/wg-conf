@@ -134,11 +134,10 @@ pub async fn start_server(
         );
         let router = server.add_service(service);
         router.serve(addr).await?;
-    }else {
+    } else {
         let router = server.add_service(RegistrationServer::new(registration));
         router.serve(addr).await?;
     };
-         
-    
+
     Ok(())
 }
