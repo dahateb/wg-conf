@@ -6,6 +6,7 @@ extern crate ipnetwork;
 extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
+extern crate base64;
 extern crate clap;
 extern crate crypto;
 extern crate hooks;
@@ -16,9 +17,9 @@ extern crate simple_error;
 extern crate http;
 
 use clap::{App, AppSettings, Arg, SubCommand};
+use client::auth::AuthBuilder;
 use client::start_client;
 use server::start_server;
-use client::auth::AuthBuilder;
 
 const VERSION: &str = "0.0.9";
 
@@ -149,7 +150,11 @@ fn main() {
             let netmask = matches.value_of("netmask").unwrap();
             let config_file = matches.value_of("config-file");
             let ca_cert = matches.value_of("ca-cert");
-            let auth = AuthBuilder::new(matches.value_of("auth-token"), matches.value_of("auth-user"),matches.value_of("auth-password"));
+            let auth = AuthBuilder::new(
+                matches.value_of("auth-token"),
+                matches.value_of("auth-user"),
+                matches.value_of("auth-password"),
+            );
             match start_client(endpoint, netmask, config_file, ca_cert, auth) {
                 Err(err) => error!("{}", err),
                 _ => (),

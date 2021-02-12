@@ -1,6 +1,6 @@
 use self::config::build_config_file;
 use crate::crypto::{generate_key_pair, get_public_key};
-use auth::{interceptor,AuthBuilder};
+use auth::{interceptor, AuthBuilder};
 use http::Uri;
 use ini::{Ini, ParseOption};
 use registration::registration_client::RegistrationClient;
@@ -43,10 +43,10 @@ pub async fn start_client(
 
     let mut client = if auth.has_authentication() {
         RegistrationClient::with_interceptor(channel, interceptor(auth))
-    }  else {
+    } else {
         RegistrationClient::new(channel)
     };
-        
+
     let request = tonic::Request::new(RegisterRequest {
         public_key: public_key,
     });

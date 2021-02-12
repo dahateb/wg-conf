@@ -1547,6 +1547,7 @@ name = "wg-conf"
 version = "0.0.9"
 dependencies = [
  "async-stream",
+ "base64",
  "clap",
  "crypto",
  "futures",

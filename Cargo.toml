@@ -30,6 +30,7 @@ simple-error = "0.2.2"
 http = "0.2.3"
 hyper = "0.14"
 tower = { version = "0.4" }
+base64 = "0.13"
 
 [build-dependencies]
 tonic-build = "0.4"

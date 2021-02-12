@@ -1,15 +1,21 @@
-use tonic::{Request, Status, metadata::{Ascii, MetadataValue}};
+use std::ops::Add;
+
+use base64::{decode, encode};
+use tonic::{
+    metadata::{Ascii, MetadataValue},
+    Request, Status,
+};
 
 pub fn interceptor(
     auth: AuthBuilder,
-) -> Box<dyn Fn(Request<()>) -> Result<Request<()>, Status> + Send + Sync + 'static> {    
-    let auth_header_value: &'static str = Box::leak(auth.get_auth().unwrap().into_boxed_str());    
+) -> Box<dyn Fn(Request<()>) -> Result<Request<()>, Status> + Send + Sync + 'static> {
+    let auth_header_value: &'static str = Box::leak(auth.get_auth().unwrap().into_boxed_str());
     let intercept = move |mut req: Request<()>| {
-        let token: MetadataValue<Ascii>  = MetadataValue::from_str(auth_header_value).unwrap();
+        let token: MetadataValue<Ascii> = MetadataValue::from_str(auth_header_value).unwrap();
         info!(
             "adding auth header {}, Intercepting request: {:?}",
             auth_header_value, req
-        );        
+        );
         req.metadata_mut().insert("authorization", token);
         Ok(req)
     };
@@ -22,7 +28,7 @@ pub struct AuthBuilder {
     auth_password: Option<String>,
 }
 
-impl AuthBuilder{
+impl AuthBuilder {
     pub fn new(
         auth_token: Option<&str>,
         auth_username: Option<&str>,
@@ -41,9 +47,14 @@ impl AuthBuilder{
 
     pub fn get_auth(&self) -> Result<String, String> {
         if self.auth_token.is_some() {
-            return Ok("Bearer ".to_owned() + self.auth_token.as_ref().unwrap())
+            return Ok("Bearer ".to_owned() + self.auth_token.as_ref().unwrap());
+        }
+        if self.auth_username.is_some() && self.auth_password.is_some() {
+            let mut auth = self.auth_username.as_ref().unwrap().clone();
+            auth.push_str(":");
+            auth.push_str(self.auth_password.as_ref().unwrap());
+            return Ok("Basic ".to_owned() + &encode(auth));
         }
         return Err("no authentication defined".to_string());
     }
-
 }
