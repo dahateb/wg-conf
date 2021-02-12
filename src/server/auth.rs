@@ -1,19 +1,9 @@
 use http::{HeaderValue, Request as HyperRequest};
 use hyper::{Body, Response as HyperResponse};
 use std::task::{Context, Poll};
-use tonic::{body::BoxBody, transport::NamedService, Code, Request, Status};
+use tonic::{body::BoxBody, transport::NamedService, Status};
 use tower::Service;
 
-pub fn interceptor(
-    script_name: &'static str,
-) -> Box<dyn Fn(Request<()>) -> Result<Request<()>, Status> + Send + Sync + 'static> {
-    //script auth currently not possible as interceptor is not async :(
-    let intercept = move |req: Request<()>| {
-        info!("Calling {}, Intercepting request: {:?}", script_name, req);
-        Ok(req)
-    };
-    return Box::new(intercept);
-}
 
 async fn auth_check(auth_file_name: String, auth_header: HeaderValue) -> bool {
     return true;

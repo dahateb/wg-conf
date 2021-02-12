@@ -7,12 +7,14 @@ use registration::RegisterReply;
 use registration::RegisterRequest;
 use std::str::FromStr;
 use tonic::transport::{Certificate, Channel, ClientTlsConfig};
+use auth::interceptor;
 
 pub mod registration {
     tonic::include_proto!("registration");
 }
 
 pub mod config;
+pub mod auth;
 
 #[tokio::main]
 pub async fn start_client(
@@ -38,10 +40,10 @@ pub async fn start_client(
     };
     let (private_key, public_key) = get_keys(config_file);
 
-    let mut client = RegistrationClient::new(channel);
+    let mut client = RegistrationClient::with_interceptor(channel, interceptor("script_name"));
     let request = tonic::Request::new(RegisterRequest {
         public_key: public_key,
-    });
+    });    
     let response = client.register_client(request).await?;
 
     let reply: &RegisterReply = response.get_ref();
