@@ -18,6 +18,7 @@ extern crate http;
 use clap::{App, AppSettings, Arg, SubCommand};
 use client::start_client;
 use server::start_server;
+use client::auth::AuthBuilder;
 
 const VERSION: &str = "0.0.9";
 
@@ -148,8 +149,8 @@ fn main() {
             let netmask = matches.value_of("netmask").unwrap();
             let config_file = matches.value_of("config-file");
             let ca_cert = matches.value_of("ca-cert");
-            let auth_token = matches.value_of("auth-token");
-            match start_client(endpoint, netmask, config_file, ca_cert, auth_token) {
+            let auth = AuthBuilder::new(matches.value_of("auth-token"), matches.value_of("auth-user"),matches.value_of("auth-password"));
+            match start_client(endpoint, netmask, config_file, ca_cert, auth) {
                 Err(err) => error!("{}", err),
                 _ => (),
             }

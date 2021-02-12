@@ -4,7 +4,6 @@ use std::task::{Context, Poll};
 use tonic::{body::BoxBody, transport::NamedService, Status};
 use tower::Service;
 
-
 async fn auth_check(auth_file_name: String, auth_header: HeaderValue) -> bool {
     return true;
 }
