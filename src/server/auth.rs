@@ -1,7 +1,7 @@
 use http::Request as HyperRequest;
 use hyper::{Body, Response as HyperResponse};
 use std::task::{Context, Poll};
-use tonic::{body::BoxBody, transport::NamedService, Request, Status};
+use tonic::{body::BoxBody, transport::NamedService, Request, Status, Code};
 use tower::Service;
 
 pub fn interceptor(
@@ -58,10 +58,7 @@ where
         Box::pin(async move {
             // Do async work here....
             if auth_check(auth_file_script).await {
-                return Ok(http::Response::builder()
-                    .status("401")
-                    .body(tonic::body::BoxBody::empty())
-                    .unwrap());
+                return Ok(Status::unauthenticated( "unauthorized").to_http());
             }
             svc.call(req).await
         })
