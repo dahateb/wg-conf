@@ -5,6 +5,7 @@ use tonic::{body::BoxBody, transport::NamedService, Status};
 use tower::Service;
 
 async fn auth_check(auth_file_name: String, auth_header: HeaderValue) -> bool {
+    info!("Auth Header: {}", auth_header.to_str().unwrap());
     return true;
 }
 
@@ -44,7 +45,7 @@ where
     fn call(&mut self, req: HyperRequest<Body>) -> Self::Future {
         let mut svc = self.inner.clone();
         let auth_file_script = self.auth_script_file.clone();
-        let auth_header = req.headers().get("Authorization").map(ToOwned::to_owned);
+        let auth_header = req.headers().get("authorization").map(ToOwned::to_owned);
         Box::pin(async move {
             // Do async work here....
             if auth_header.is_none() || auth_check(auth_file_script, auth_header.unwrap()).await {
