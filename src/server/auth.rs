@@ -1,4 +1,4 @@
-use http::Request as HyperRequest;
+use http::{HeaderValue, Request as HyperRequest};
 use hyper::{Body, Response as HyperResponse};
 use std::task::{Context, Poll};
 use tonic::{body::BoxBody, transport::NamedService, Request, Status, Code};
@@ -15,7 +15,7 @@ pub fn interceptor(
     return Box::new(intercept);
 }
 
-async fn auth_check(auth_file_name: String) -> bool {
+async fn auth_check(auth_file_name: String, auth_header: HeaderValue) -> bool {
     return true;
 }
 
@@ -55,9 +55,10 @@ where
     fn call(&mut self, req: HyperRequest<Body>) -> Self::Future {
         let mut svc = self.inner.clone();
         let auth_file_script = self.auth_script_file.clone();
+        let auth_header = req.headers().get("Authorization").map(ToOwned::to_owned);
         Box::pin(async move {
             // Do async work here....
-            if auth_check(auth_file_script).await {
+            if auth_header.is_none() || auth_check(auth_file_script, auth_header.unwrap()).await {
                 return Ok(Status::unauthenticated( "unauthorized").to_http());
             }
             svc.call(req).await
