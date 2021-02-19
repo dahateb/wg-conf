@@ -25,7 +25,7 @@ impl RegistrationHooks {
     }
 }
 
-async fn run(command: &str) -> Result<String, Box<dyn std::error::Error>> {
+pub async fn run(command: &str) -> Result<String, Box<dyn std::error::Error>> {
     let mut fmt_output = String::new();
     if command.len() > 0 {
         let output = if cfg!(target_os = "windows") {

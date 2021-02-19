@@ -1,6 +1,5 @@
-use std::ops::Add;
 
-use base64::{decode, encode};
+use base64::{encode};
 use tonic::{
     metadata::{Ascii, MetadataValue},
     Request, Status,

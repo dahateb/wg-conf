@@ -1,3 +1,4 @@
+use hooks::run;
 use http::{HeaderValue, Request as HyperRequest};
 use hyper::{Body, Response as HyperResponse};
 use std::task::{Context, Poll};
@@ -5,8 +6,15 @@ use tonic::{body::BoxBody, transport::NamedService, Status};
 use tower::Service;
 
 async fn auth_check(auth_file_name: String, auth_header: HeaderValue) -> bool {
-    info!("Auth Header: {}", auth_header.to_str().unwrap());
-    return true;
+    let auth_header = auth_header.to_str().unwrap();
+    info!("Auth Header: {}", auth_header);
+    let result = run(&format!("{} {}", auth_file_name, auth_header)).await;
+    if result.is_ok() {
+        info!("{}", result.unwrap());
+        return true;
+    }
+    error!("{}", result.unwrap_err());
+    return false;
 }
 
 // instead of interceptor to handle async function
@@ -48,7 +56,7 @@ where
         let auth_header = req.headers().get("authorization").map(ToOwned::to_owned);
         Box::pin(async move {
             // Do async work here....
-            if auth_header.is_none() || auth_check(auth_file_script, auth_header.unwrap()).await {
+            if auth_header.is_none() || !auth_check(auth_file_script, auth_header.unwrap()).await {
                 return Ok(Status::unauthenticated("unauthorized").to_http());
             }
             svc.call(req).await
