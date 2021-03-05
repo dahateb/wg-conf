@@ -57,3 +57,32 @@ impl AuthBuilder {
         return Err("no authentication defined".to_string());
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use base64::encode;
+
+    use super::AuthBuilder;
+    
+
+    #[test]
+    fn test_get_auth_token() {
+        let token = "asdfghjkllzuiztizu";
+        let builder = AuthBuilder::new(Some(token), None, None);
+        let auth_token = builder.get_auth();
+        assert_eq!(format!("Bearer {}", token), auth_token.unwrap());
+    }
+
+
+    #[test]
+    fn test_get_auth_user_password() {
+        let user = "test";
+        let pass = "12345678";
+        let builder = AuthBuilder::new(None, Some(user),Some(pass));
+        let auth_token = builder.get_auth();
+        let check = format!("Basic {}", encode("test:12345678"));
+        assert_eq!(check, auth_token.unwrap());
+    }
+
+}
