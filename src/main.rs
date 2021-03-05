@@ -6,6 +6,7 @@ extern crate ipnetwork;
 extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
+extern crate base64;
 extern crate clap;
 extern crate crypto;
 extern crate hooks;
@@ -16,10 +17,11 @@ extern crate simple_error;
 extern crate http;
 
 use clap::{App, AppSettings, Arg, SubCommand};
+use client::auth::AuthBuilder;
 use client::start_client;
 use server::start_server;
 
-const VERSION: &str = "0.0.9";
+const VERSION: &str = "0.0.10";
 
 fn main() {
     pretty_env_logger::init();
@@ -59,7 +61,31 @@ fn main() {
                         .long("tls-ca-certificate")
                         .help("root ca for use with tls")
                         .takes_value(true),
-                ),
+                )
+                .arg(
+                    Arg::with_name("auth-token")
+                        .long("auth-token")
+                        .help("Auth Token to send to server. If using single token auth")
+                        .conflicts_with_all(&["auth-user", "auth-password"])                        
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::with_name("auth-user")
+                        .long("auth-user")
+                        .help("Auth user to send to server. Use together with auth-password")
+                        .requires("auth-password")
+                        .conflicts_with("auth-token")
+                        .takes_value(true),
+                )
+                .arg(
+                    Arg::with_name("auth-password")
+                        .long("auth-password")
+                        .help("Auth password to send to server")
+                        .requires("auth-user")
+                        .conflicts_with("auth-token")                        
+                        .takes_value(true),
+                )
+                ,
         )
         .subcommand(
             SubCommand::with_name("server")
@@ -103,6 +129,12 @@ fn main() {
                         .takes_value(true),
                 )
                 .arg(
+                    Arg::with_name("auth-script")
+                        .long("auth-script")
+                        .help("shell script to validate auth info from client. Args will be passed as $1 $2")
+                        .takes_value(true),
+                )
+                .arg(
                     Arg::with_name("tls-key")
                         .long("tls-private-key")
                         .help("Server private keyfor use with tls")
@@ -118,7 +150,12 @@ fn main() {
             let netmask = matches.value_of("netmask").unwrap();
             let config_file = matches.value_of("config-file");
             let ca_cert = matches.value_of("ca-cert");
-            match start_client(endpoint, netmask, config_file, ca_cert) {
+            let auth = AuthBuilder::new(
+                matches.value_of("auth-token"),
+                matches.value_of("auth-user"),
+                matches.value_of("auth-password"),
+            );
+            match start_client(endpoint, netmask, config_file, ca_cert, auth) {
                 Err(err) => error!("{}", err),
                 _ => (),
             }
@@ -131,6 +168,7 @@ fn main() {
                 .unwrap_or("examples/conf/test.ini");
             let pre_register = matches.value_of("pre-register");
             let post_register = matches.value_of("post-register");
+            let auth_script = matches.value_of("auth-script");
             let server_tls_cert = matches.value_of("tls-cert");
             let server_tls_key = matches.value_of("tls-key");
             match start_server(
@@ -140,6 +178,7 @@ fn main() {
                 config_file,
                 pre_register,
                 post_register,
+                auth_script,
                 server_tls_cert,
                 server_tls_key,
             ) {

@@ -1,6 +1,7 @@
 use self::config::build_config_file;
 use crate::crypto::{generate_key_pair, get_public_key};
-use http::{uri, Uri};
+use auth::{interceptor, AuthBuilder};
+use http::Uri;
 use ini::{Ini, ParseOption};
 use registration::registration_client::RegistrationClient;
 use registration::RegisterReply;
@@ -12,6 +13,7 @@ pub mod registration {
     tonic::include_proto!("registration");
 }
 
+pub mod auth;
 pub mod config;
 
 #[tokio::main]
@@ -20,6 +22,7 @@ pub async fn start_client(
     netmask: &str,
     config_file: Option<&str>,
     ca_cert: Option<&str>,
+    auth: AuthBuilder,
 ) -> Result<(), Box<dyn std::error::Error>> {
     info!("client mode");
     let uri: Uri = endpoint.parse()?;
@@ -27,7 +30,7 @@ pub async fn start_client(
     let channel = if ca_cert.is_some() {
         let pem = tokio::fs::read(ca_cert.unwrap()).await?;
         let ca = Certificate::from_pem(pem);
-        
+
         let tls = ClientTlsConfig::new()
             .ca_certificate(ca)
             .domain_name(uri.host().unwrap());
@@ -35,14 +38,18 @@ pub async fn start_client(
         Channel::builder(uri).tls_config(tls)?.connect().await?
     } else {
         Channel::builder(uri).connect().await?
-    };    
+    };
     let (private_key, public_key) = get_keys(config_file);
 
-    let mut client = RegistrationClient::new(channel);
+    let mut client = if auth.has_authentication() {
+        RegistrationClient::with_interceptor(channel, interceptor(auth))
+    } else {
+        RegistrationClient::new(channel)
+    };
+
     let request = tonic::Request::new(RegisterRequest {
         public_key: public_key,
     });
-
     let response = client.register_client(request).await?;
 
     let reply: &RegisterReply = response.get_ref();

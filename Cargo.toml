@@ -1,6 +1,6 @@
 [package]
 name = "wg-conf"
-version = "0.0.9"
+version = "0.0.10"
 authors = ["dan"]
 edition = "2018"
 
@@ -28,6 +28,9 @@ crypto = { path = "crypto" }
 hooks = { path = "hooks" }
 simple-error = "0.2.2"
 http = "0.2.3"
+hyper = "0.14"
+tower = { version = "0.4" }
+base64 = "0.13"
 
 [build-dependencies]
 tonic-build = "0.4"

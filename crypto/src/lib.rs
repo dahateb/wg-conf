@@ -20,9 +20,13 @@ pub fn generate_key_pair() -> (String, String) {
 }
 
 #[cfg(test)]
-mod tests {
+mod tests {    
+
+    use super::{generate_key_pair, get_public_key};
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn test_get_public_key() {
+        let (priv_key, pub_key) = generate_key_pair();
+        let pub_key_test = get_public_key(&priv_key);
+        assert_eq!(pub_key, pub_key_test)
     }
 }

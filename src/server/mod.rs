@@ -1,3 +1,4 @@
+use auth::InterceptedService;
 use config::WireguardConfig;
 use hooks::RegistrationHooks;
 use registration::registration_server::{Registration, RegistrationServer};
@@ -12,6 +13,7 @@ pub mod registration {
     tonic::include_proto!("registration");
 }
 
+pub mod auth;
 pub mod backend;
 pub mod config;
 
@@ -98,6 +100,7 @@ pub async fn start_server(
     config_file: &str,
     pre_register: Option<&str>,
     post_register: Option<&str>,
+    auth_script: Option<&str>,
     server_tls_cert: Option<&str>,
     server_tls_key: Option<&str>,
 ) -> Result<(), Box<dyn std::error::Error>> {
@@ -122,7 +125,19 @@ pub async fn start_server(
         info!("using tls");
         server = server.tls_config(ServerTlsConfig::new().identity(identity.unwrap()))?;
     }
-    let router = server.add_service(RegistrationServer::new(registration));
-    router.serve(addr).await?;
+
+    // TODO find out correct typing to avoid code duplication
+    if auth_script.is_some() {
+        let service = InterceptedService::new(
+            RegistrationServer::new(registration),
+            auth_script.unwrap().to_string(),
+        );
+        let router = server.add_service(service);
+        router.serve(addr).await?;
+    } else {
+        let router = server.add_service(RegistrationServer::new(registration));
+        router.serve(addr).await?;
+    };
+
     Ok(())
 }
