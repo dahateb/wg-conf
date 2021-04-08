@@ -21,7 +21,7 @@ use client::auth::AuthBuilder;
 use client::start_client;
 use server::start_server;
 
-const VERSION: &str = "0.0.11";
+const VERSION: &str = "0.0.12";
 
 fn main() {
     pretty_env_logger::init();

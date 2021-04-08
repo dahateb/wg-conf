@@ -13,7 +13,7 @@ pub fn build_config_file(
     netmask: &str,
     config_file: Option<&str>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let config_file_name = config_file.unwrap_or("/etc/wireguard/wg0.conf");
+    let config_file_name = config_file.ok_or("config file not set")?;
     let ipv4_addr: Ipv4Addr = address.parse()?;
     let netmask_int = netmask.parse()?;
     let ipv4_network = Ipv4Network::new(ipv4_addr, netmask_int)?;
@@ -33,4 +33,28 @@ pub fn build_config_file(
 
 pub fn config_file_exists(config_file: Option<&str>) -> bool {
     config_file.is_some() && std::path::Path::new(config_file.unwrap()).exists()
+}
+
+
+#[cfg(test)]
+mod tests {
+
+    use super::{config_file_exists};
+    #[test]
+    fn test_config_file_exists() {
+        let config_file = Some("examples/conf/conf.ini");
+        assert!(config_file_exists(config_file))
+    }
+
+    #[test]
+    fn test_config_file_not_exists() {
+        let config_file = Some("blubb");
+        assert!(!config_file_exists(config_file))
+    }
+
+    #[test]
+    fn test_config_file_empty() {
+        let config_file = None;
+        assert!(!config_file_exists(config_file))
+    }
 }
