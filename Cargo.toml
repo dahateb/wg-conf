@@ -1,6 +1,6 @@
 [package]
 name = "wg-conf"
-version = "0.0.10"
+version = "0.0.11"
 authors = ["dan"]
 edition = "2018"
 

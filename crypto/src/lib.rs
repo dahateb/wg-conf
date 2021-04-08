@@ -20,7 +20,7 @@ pub fn generate_key_pair() -> (String, String) {
 }
 
 #[cfg(test)]
-mod tests {    
+mod tests {
 
     use super::{generate_key_pair, get_public_key};
     #[test]

@@ -1,4 +1,4 @@
-use self::config::build_config_file;
+use self::config::{build_config_file, config_file_exists};
 use crate::crypto::{generate_key_pair, get_public_key};
 use auth::{interceptor, AuthBuilder};
 use http::Uri;
@@ -39,7 +39,12 @@ pub async fn start_client(
     } else {
         Channel::builder(uri).connect().await?
     };
-    let (private_key, public_key) = get_keys(config_file);
+
+    let (private_key, public_key) = if config_file_exists(config_file) {
+        get_keys_from_file(config_file.unwrap())
+    } else {
+        generate_key_pair()
+    };
 
     let mut client = if auth.has_authentication() {
         RegistrationClient::with_interceptor(channel, interceptor(auth))
@@ -68,24 +73,20 @@ pub async fn start_client(
     Ok(())
 }
 
-fn get_keys(config_file: Option<&str>) -> (String, String) {
-    if let Some(ini_file) = config_file {
-        let i: Ini = Ini::load_from_file_opt(
-            ini_file,
-            ParseOption {
-                enabled_quote: true,
-                enabled_escape: true,
-            },
-        )
-        .map_err(|e| format!("Error loading ini file {} : {}", ini_file, e))
-        .unwrap();
-        let section = i.section(Some("Interface")).unwrap();
-        let private_key = section.get("PrivateKey");
-        (
-            String::from_str(private_key.unwrap()).unwrap(),
-            get_public_key(private_key.unwrap()),
-        )
-    } else {
-        generate_key_pair()
-    }
+fn get_keys_from_file(ini_file: &str) -> (String, String) {
+    let i: Ini = Ini::load_from_file_opt(
+        ini_file,
+        ParseOption {
+            enabled_quote: true,
+            enabled_escape: true,
+        },
+    )
+    .map_err(|e| format!("Error loading ini file {} : {}", ini_file, e))
+    .unwrap();
+    let section = i.section(Some("Interface")).unwrap();
+    let private_key = section.get("PrivateKey");
+    (
+        String::from_str(private_key.unwrap()).unwrap(),
+        get_public_key(private_key.unwrap()),
+    )
 }

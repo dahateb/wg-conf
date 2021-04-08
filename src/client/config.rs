@@ -30,3 +30,7 @@ pub fn build_config_file(
     conf.write_to_file(config_file_name).unwrap();
     Ok(())
 }
+
+pub fn config_file_exists(config_file: Option<&str>) -> bool {
+    config_file.is_some() && std::path::Path::new(config_file.unwrap()).exists()
+}
