@@ -34,3 +34,6 @@ base64 = "0.13"
 
 [build-dependencies]
 tonic-build = "0.4"
+
+[profile.release]
+lto = true
