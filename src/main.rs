@@ -11,6 +11,7 @@ extern crate clap;
 extern crate crypto;
 extern crate hooks;
 extern crate url;
+extern crate tempfile;
 
 #[macro_use]
 extern crate simple_error;
