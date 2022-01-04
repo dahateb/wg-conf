@@ -46,16 +46,19 @@ pub async fn start_client(
         generate_key_pair()
     };
 
-    let mut client = if auth.has_authentication() {
-        RegistrationClient::with_interceptor(channel, interceptor(auth))
-    } else {
-        RegistrationClient::new(channel)
-    };
-
     let request = tonic::Request::new(RegisterRequest {
         public_key: public_key,
     });
-    let response = client.register_client(request).await?;
+
+    let response = if auth.has_authentication() {
+        RegistrationClient::with_interceptor(channel, interceptor(auth))
+            .register_client(request)
+            .await?
+    } else {
+        RegistrationClient::new(channel)
+            .register_client(request)
+            .await?
+    };
 
     let reply: &RegisterReply = response.get_ref();
     info!("RESPONSE={:?}", reply);

@@ -6,9 +6,13 @@ use tonic::{body::BoxBody, transport::NamedService, Status};
 use tower::Service;
 
 async fn auth_check(auth_file_name: String, auth_header: HeaderValue) -> bool {
-    let header_parts: Vec::<&str> = auth_header.to_str().unwrap().split_whitespace().collect();
+    let header_parts: Vec<&str> = auth_header.to_str().unwrap().split_whitespace().collect();
     info!("Auth Header: {} {}", header_parts[0], header_parts[1]);
-    let result = run(&format!("{} '{}' '{}'", auth_file_name, header_parts[0], header_parts[1])).await;
+    let result = run(&format!(
+        "{} '{}' '{}'",
+        auth_file_name, header_parts[0], header_parts[1]
+    ))
+    .await;
     if result.is_ok() {
         info!("{}", result.unwrap());
         return true;

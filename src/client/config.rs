@@ -35,11 +35,10 @@ pub fn config_file_exists(config_file: Option<&str>) -> bool {
     config_file.is_some() && std::path::Path::new(config_file.unwrap()).exists()
 }
 
-
 #[cfg(test)]
 mod tests {
 
-    use super::{config_file_exists};
+    use super::config_file_exists;
     #[test]
     fn test_config_file_exists() {
         let config_file = Some("examples/conf/conf.ini");
