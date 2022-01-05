@@ -34,7 +34,7 @@ impl AuthBuilder {
     ) -> AuthBuilder {
         let (auth_type, auth_value) = if auth_token.is_some() {
             (Some(AuthType::Bearer), Some(auth_token.unwrap().to_owned()))
-        } else if auth_username.is_some() && auth_password.is_some(){
+        } else if auth_username.is_some() && auth_password.is_some() {
             let mut auth = auth_username.unwrap().to_string();
             auth.push_str(":");
             auth.push_str(auth_password.unwrap().as_ref());
@@ -49,12 +49,14 @@ impl AuthBuilder {
     }
 
     pub fn has_authentication(&self) -> bool {
-        self.auth_type.is_some()    
+        self.auth_type.is_some()
     }
 
     pub fn get_auth(&self) -> Result<String, String> {
         if self.auth_type.is_some() && self.auth_value.is_some() {
-            return Ok(self.auth_type.clone().unwrap().to_string() + " " + &self.auth_value.clone().unwrap())
+            return Ok(self.auth_type.clone().unwrap().to_string()
+                + " "
+                + &self.auth_value.clone().unwrap());
         }
         return Err("no authentication defined".to_string());
     }

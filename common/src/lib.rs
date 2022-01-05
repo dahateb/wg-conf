@@ -5,7 +5,7 @@ pub enum AuthType {
     #[strum(ascii_case_insensitive)]
     Basic,
     #[strum(ascii_case_insensitive)]
-    Bearer
+    Bearer,
 }
 
 #[cfg(test)]

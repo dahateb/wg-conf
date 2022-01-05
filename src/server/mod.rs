@@ -132,11 +132,12 @@ pub async fn start_server(
             RegistrationServer::new(registration),
             auth_script.unwrap().to_string(),
         );
-        let router = server.add_service(service);
-        router.serve(addr).await?;
+        server.add_service(service).serve(addr).await?;
     } else {
-        let router = server.add_service(RegistrationServer::new(registration));
-        router.serve(addr).await?;
+        server
+            .add_service(RegistrationServer::new(registration))
+            .serve(addr)
+            .await?;
     };
 
     Ok(())

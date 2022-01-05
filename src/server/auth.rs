@@ -1,13 +1,13 @@
+use common::AuthType;
 use hooks::run;
-use tempfile::NamedTempFile;
-use std::io::{Write};
 use http::{HeaderValue, Request as HyperRequest};
 use hyper::{Body, Response as HyperResponse};
+use std::io::Write;
+use std::str::FromStr;
 use std::task::{Context, Poll};
+use tempfile::NamedTempFile;
 use tonic::{body::BoxBody, transport::NamedService, Status};
 use tower::Service;
-use common::AuthType;
-use std::str::FromStr;
 
 async fn auth_check(auth_file_name: String, auth_header: HeaderValue) -> bool {
     let header_parts: Vec<&str> = auth_header.to_str().unwrap().split_whitespace().collect();
@@ -15,7 +15,11 @@ async fn auth_check(auth_file_name: String, auth_header: HeaderValue) -> bool {
     // check auth type
     let auth_type = AuthType::from_str(header_parts[0]);
     if auth_type.is_err() {
-        error!("Got wrong or unsupported auth type: {} - {}", header_parts[0], auth_type.unwrap_err());
+        error!(
+            "Got wrong or unsupported auth type: {} - {}",
+            header_parts[0],
+            auth_type.unwrap_err()
+        );
         return false;
     }
     /*  write credentials in tempfile  */
@@ -24,7 +28,9 @@ async fn auth_check(auth_file_name: String, auth_header: HeaderValue) -> bool {
     let tmp_file_path = tmp_file.path();
     let result = run(&format!(
         "{} '{}' '{}'",
-        auth_file_name, auth_type.unwrap().to_string(), tmp_file_path.to_str().unwrap()
+        auth_file_name,
+        auth_type.unwrap().to_string(),
+        tmp_file_path.to_str().unwrap()
     ))
     .await;
     let _ = tmp_file.close();

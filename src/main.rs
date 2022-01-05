@@ -11,8 +11,8 @@ extern crate clap;
 extern crate common;
 extern crate crypto;
 extern crate hooks;
-extern crate url;
 extern crate tempfile;
+extern crate url;
 
 #[macro_use]
 extern crate simple_error;
@@ -23,7 +23,7 @@ use client::auth::AuthBuilder;
 use client::start_client;
 use server::start_server;
 
-const VERSION: &str = "0.1.0";
+const VERSION: &str = "0.1.1";
 
 fn main() {
     pretty_env_logger::init();
