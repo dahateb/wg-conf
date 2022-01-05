@@ -1,6 +1,6 @@
 # wg-conf
 
-## Wireguare config tool
+## Wireguard config tool
 
 allows receiving wireguard configuration remotely
 
