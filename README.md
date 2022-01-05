@@ -1,5 +1,11 @@
 # wg-conf
 
+## Wireguare config tool
+
+allows receiving wireguard configuration remotely
+
+supports authentication and tls 
+
 build:
 
 cargo build
