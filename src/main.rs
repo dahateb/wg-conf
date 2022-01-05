@@ -8,6 +8,7 @@ extern crate pretty_env_logger;
 extern crate log;
 extern crate base64;
 extern crate clap;
+extern crate common;
 extern crate crypto;
 extern crate hooks;
 extern crate url;

@@ -1,3 +1,6 @@
 #!/bin/bash
 
-echo $1 $2
+if [ -f $2 ]; then
+    echo $1 $2
+fi
+
