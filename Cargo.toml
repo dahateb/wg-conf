@@ -1,13 +1,13 @@
 [package]
 name = "wg-conf"
-version = "0.0.14"
+version = "0.1.0"
 authors = ["dan"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace]
-members = ["crypto", "hooks"]
+members = ["common", "crypto", "hooks"]
 
 [dependencies]
 ### -> tonic dependencies
@@ -26,11 +26,13 @@ ipnetwork = "0.17"
 url = "2.2.0"
 crypto = { path = "crypto" }
 hooks = { path = "hooks" }
+common = { path = "common" }
 simple-error = "0.2.2"
 http = "0.2.3"
 hyper = "0.14"
 tower = { version = "0.4" }
 base64 = "0.13"
+tempfile = "3.2.0"
 
 [build-dependencies]
 tonic-build = "0.6.2"

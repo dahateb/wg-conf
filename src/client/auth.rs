@@ -1,4 +1,5 @@
 use base64::encode;
+use common::AuthType;
 use tonic::{
     metadata::{Ascii, MetadataValue},
     Request, Status,
@@ -21,9 +22,8 @@ pub fn interceptor(
 }
 
 pub struct AuthBuilder {
-    auth_token: Option<String>,
-    auth_username: Option<String>,
-    auth_password: Option<String>,
+    auth_type: Option<AuthType>,
+    auth_value: Option<String>,
 }
 
 impl AuthBuilder {
@@ -32,26 +32,29 @@ impl AuthBuilder {
         auth_username: Option<&str>,
         auth_password: Option<&str>,
     ) -> AuthBuilder {
+        let (auth_type, auth_value) = if auth_token.is_some() {
+            (Some(AuthType::Bearer), Some(auth_token.unwrap().to_owned()))
+        } else if auth_username.is_some() && auth_password.is_some(){
+            let mut auth = auth_username.unwrap().to_string();
+            auth.push_str(":");
+            auth.push_str(auth_password.unwrap().as_ref());
+            (Some(AuthType::Basic), Some(encode(auth)))
+        } else {
+            (None, None)
+        };
         AuthBuilder {
-            auth_token: auth_token.map(|s| s.to_string()),
-            auth_username: auth_username.map(|s| s.to_string()),
-            auth_password: auth_password.map(|s| s.to_string()),
+            auth_type: auth_type,
+            auth_value: auth_value,
         }
     }
 
     pub fn has_authentication(&self) -> bool {
-        self.auth_token.is_some() || self.auth_username.is_some() && self.auth_password.is_some()
+        self.auth_type.is_some()    
     }
 
     pub fn get_auth(&self) -> Result<String, String> {
-        if self.auth_token.is_some() {
-            return Ok("Bearer ".to_owned() + self.auth_token.as_ref().unwrap());
-        }
-        if self.auth_username.is_some() && self.auth_password.is_some() {
-            let mut auth = self.auth_username.as_ref().unwrap().clone();
-            auth.push_str(":");
-            auth.push_str(self.auth_password.as_ref().unwrap());
-            return Ok("Basic ".to_owned() + &encode(auth));
+        if self.auth_type.is_some() && self.auth_value.is_some() {
+            return Ok(self.auth_type.clone().unwrap().to_string() + " " + &self.auth_value.clone().unwrap())
         }
         return Err("no authentication defined".to_string());
     }
