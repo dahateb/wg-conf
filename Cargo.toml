@@ -33,6 +33,7 @@ hyper = "0.14"
 tower = { version = "0.4" }
 base64 = "0.13"
 tempfile = "3.2.0"
+thiserror = "1.0.30"
 
 [build-dependencies]
 tonic-build = "0.6.2"
