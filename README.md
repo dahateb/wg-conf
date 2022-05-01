@@ -6,11 +6,22 @@ allows receiving wireguard configuration remotely
 
 supports authentication and tls 
 
-build:
+##  build:
+
+- install protoc 
+
+- Linux: 
+```
+    apt install -y protobuf-compiler
+```
+
+- Other Os:
+
+    https://grpc.io/docs/protoc-installation/
 
 cargo build
 
-run client:
+## run client:
 cargo run client
 
 ```
@@ -30,7 +41,7 @@ OPTIONS:
     -n <netmask>                          Netmask of the route to the VPN [default: 16]
 ```
 
-run server:
+## run server:
 cargo run server
 
 ```
