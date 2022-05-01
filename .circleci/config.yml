@@ -19,7 +19,9 @@ jobs:
           command: rustup toolchain install stable
       - run:
           name: Install requirements
-          command: sudo apt install -y protobuf-compiler          
+          command: |
+            sudo apt update
+            sudo apt install -y protobuf-compiler          
       - run:
           name: Stable Build
           command: |
@@ -42,7 +44,9 @@ jobs:
       - checkout
       - run:
           name: Install requirements
-          command: sudo apt install -y protobuf-compiler
+          command: |
+            sudo apt update
+            sudo apt install -y protobuf-compiler
       - run:
           name: Install stable toolchain
           command: rustup toolchain install stable
