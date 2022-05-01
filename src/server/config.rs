@@ -5,6 +5,25 @@ use ini::{Ini, ParseOption, Properties, SectionEntry};
 use ipnetwork::{Ipv4Network, Ipv6Network};
 use std::net::{Ipv4Addr, Ipv6Addr};
 use tokio::sync::Mutex;
+use thiserror::Error;
+
+
+#[derive(Error, Debug)]
+pub enum ConfigError {
+
+    #[error("File could not be loaded")]
+    FileError(#[from] std::io::Error),
+
+    #[error("Ip could not be found")]
+    IpNotFoundError,
+
+    #[error("Address could not parsed")]
+    IpNetworkError(#[from] ipnetwork::IpNetworkError),
+
+    #[error("unknown config error")]
+    Unknown
+
+}
 
 pub struct WireguardConfig {
     ini: Mutex<Ini>,
@@ -61,7 +80,7 @@ impl WireguardConfig {
         return conf;
     }
 
-    pub async fn register(&self, key: String) -> Result<RegisterResult, String> {
+    pub async fn register(&self, key: String) -> Result<RegisterResult, ConfigError> {
         let result = RegisterResult {
             ipv4_addr: self.get_ipv4(key.clone())?,
             ipv6_addr: self.get_ipv6().ok(),
@@ -100,51 +119,48 @@ impl WireguardConfig {
                     }
                 }
             }
-            ini.write_to_file(self.filename.clone()).unwrap()
+            ini.write_to_file(self.filename.clone())?
         }
 
         Ok(result)
     }
 
-    fn get_ipv4(&self, key: String) -> Result<Ipv4Addr, String> {
-        let mut err_result = "Ip not found".into();
+    fn get_ipv4(&self, key: String) -> Result<Ipv4Addr, ConfigError> {
+        let err_result = ConfigError::IpNotFoundError;
         if let Some(ip) = self.backend.retrieve_ipv4(&key) {
             return Ok(ip);
         }
         for addr in &self.adresses {
             println!("Local Address={}", addr.trim());
-            let net_option: Result<Ipv4Network, _> = addr.parse();
+            let net: Ipv4Network = addr.parse()?;
             let ipv4_len = self.backend.get_ipv4_size();
-            debug!("backend size: {}", ipv4_len);
-            match net_option {
-                Ok(net) => {
-                    let next = net.nth(ipv4_len + 2).unwrap();
-                    self.backend.store_ipv4(key, next);
-                    debug!("Network Size={}", net.size());
-                    debug!("IP={}", net.ip());
-                    debug!("2nd={}", next);
-                    return Ok(next);
-                }
-                Err(err) => err_result = format!("ip parse Error: {}", err),
-            }
+            debug!("backend size: {}", ipv4_len);                      
+            let next = net.nth(ipv4_len + 2);
+            if next.is_some() {
+                let next_ip = next.unwrap();
+                self.backend.store_ipv4(key, next_ip);
+                debug!("Network Size={}", net.size());
+                debug!("IP={}", net.ip());
+                debug!("2nd={}", next_ip);
+                return Ok(next_ip);     
+            }                         
         }
         return Err(err_result);
     }
 
-    fn get_ipv6(&self) -> Result<Ipv6Addr, String> {
-        let mut err_result = "Ip not found".into();
+    fn get_ipv6(&self) -> Result<Ipv6Addr, ConfigError> {
+        let err_result = ConfigError::IpNotFoundError;
         for addr in &self.adresses {
             debug!("Address={}", addr.trim());
-            let net_option: Result<Ipv6Network, _> = addr.trim().parse();
-            match net_option {
-                Ok(net) => {
-                    debug!("Network Size={}", net.size());
-                    debug!("IP={}", net.ip());
-                    debug!("2nd={}", net.iter().next().unwrap());
-                    return Ok(net.iter().next().unwrap());
-                }
-                Err(err) => err_result = format!("ipv6 parse Error: {}", err),
+            let net: Ipv6Network = addr.trim().parse()?;
+            let next_ip_option = net.iter().next();
+            if next_ip_option.is_some() {
+                debug!("Network Size={}", net.size());
+                debug!("IP={}", net.ip());
+                debug!("2nd={}", next_ip_option.unwrap());
+                return Ok(next_ip_option.unwrap());   
             }
+                     
         }
         return Err(err_result);
     }
