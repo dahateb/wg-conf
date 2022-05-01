@@ -1,6 +1,6 @@
 [package]
 name = "wg-conf"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["dan"]
 edition = "2021"
 
@@ -11,24 +11,24 @@ members = ["common", "crypto", "hooks"]
 
 [dependencies]
 ### -> tonic dependencies
-tonic = {version = "0.6.2", features = ["tls"]}
-prost = "0.9"
+tonic = {version = "0.7", features = ["tls"]}
+prost = "0.10"
 tokio = { version = "1.0", features = ["rt-multi-thread", "time", "fs", "macros"] }
 tokio-stream = { version =  "0.1", features = ["net"] }
 async-stream = "0.3"
 futures = { version = "0.3", default-features = false, features = ["alloc"] }
 ### <- 
-clap = "2.33"
+clap = "2.34"
 log = "0.4"
 pretty_env_logger = "0.4"
 rust-ini = {git="https://github.com/dahateb/rust-ini"}
-ipnetwork = "0.17"
+ipnetwork = "0.19"
 url = "2.2.0"
 crypto = { path = "crypto" }
 hooks = { path = "hooks" }
 common = { path = "common" }
 simple-error = "0.2.2"
-http = "0.2.3"
+http = "0.2.7"
 hyper = "0.14"
 tower = { version = "0.4" }
 base64 = "0.13"
@@ -36,7 +36,7 @@ tempfile = "3.2.0"
 thiserror = "1.0.30"
 
 [build-dependencies]
-tonic-build = "0.6.2"
+tonic-build = { version = "0.7" }
 
 [profile.release]
 lto = true

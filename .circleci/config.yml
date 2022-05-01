@@ -8,7 +8,7 @@ jobs:
       # your own using the Dockerfile provided below
       # and replace here. I put my own image here for
       # the example.
-      - image: cimg/rust:1.49
+      - image: cimg/rust:1.60
     environment:
       TZ: "/usr/share/zoneinfo/Europe/Paris"
     working_directory: /home/circleci/project
@@ -17,6 +17,11 @@ jobs:
       - run:
           name: Install stable toolchain
           command: rustup toolchain install stable
+      - run:
+          name: Install requirements
+          command: |
+            sudo apt update
+            sudo apt install -y protobuf-compiler          
       - run:
           name: Stable Build
           command: |
@@ -31,12 +36,17 @@ jobs:
       # your own using the Dockerfile provided below
       # and replace here. I put my own image here for
       # the example.
-      - image: cimg/rust:1.57
+      - image: cimg/rust:1.60
     environment:
       TZ: "/usr/share/zoneinfo/Europe/Paris"
     working_directory: /home/circleci/project
     steps:
       - checkout
+      - run:
+          name: Install requirements
+          command: |
+            sudo apt update
+            sudo apt install -y protobuf-compiler
       - run:
           name: Install stable toolchain
           command: rustup toolchain install stable
