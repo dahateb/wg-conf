@@ -65,7 +65,7 @@ jobs:
             - target/release
   publish-github-release:
     docker:
-      - image: cimg/go:1.16
+      - image: cimg/go:1.17
     working_directory: /home/circleci/project
     steps:
       - attach_workspace:
