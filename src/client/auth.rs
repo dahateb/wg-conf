@@ -10,7 +10,7 @@ pub fn interceptor(
 ) -> Box<dyn Fn(Request<()>) -> Result<Request<()>, Status> + Send + Sync + 'static> {
     let auth_header_value: &'static str = Box::leak(auth.get_auth().unwrap().into_boxed_str());
     let intercept = move |mut req: Request<()>| {
-        let token: MetadataValue<Ascii> = MetadataValue::from_str(auth_header_value).unwrap();
+        let token: MetadataValue<Ascii> = MetadataValue::try_from(auth_header_value).unwrap();
         info!(
             "adding auth header {}, Intercepting request: {:?}",
             auth_header_value, req
