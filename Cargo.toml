@@ -1,6 +1,6 @@
 [package]
 name = "wg-conf"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["dan"]
 edition = "2021"
 
@@ -20,18 +20,18 @@ futures = { version = "0.3", default-features = false, features = ["alloc"] }
 ### <- 
 clap = "2.34"
 log = "0.4"
-pretty_env_logger = "0.4"
+pretty_env_logger = "0.5.0"
 rust-ini = {git="https://github.com/dahateb/rust-ini"}
-ipnetwork = "0.19"
+ipnetwork = "0.20.0"
 url = "2.2.0"
 crypto = { path = "crypto" }
 hooks = { path = "hooks" }
 common = { path = "common" }
-simple-error = "0.2.2"
+simple-error = "0.3.1"
 http = "0.2.7"
 hyper = "0.14"
-tower = { version = "0.4" }
-base64 = "0.13"
+tower = { version = "0.5.2" }
+base64 = "0.22.1"
 tempfile = "3.2.0"
 
 [build-dependencies]

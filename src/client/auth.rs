@@ -1,4 +1,4 @@
-use base64::encode;
+use base64::{Engine as _, engine::general_purpose};
 use common::AuthType;
 use tonic::{
     metadata::{Ascii, MetadataValue},
@@ -38,7 +38,7 @@ impl AuthBuilder {
             let mut auth = auth_username.unwrap().to_string();
             auth.push_str(":");
             auth.push_str(auth_password.unwrap().as_ref());
-            (Some(AuthType::Basic), Some(encode(auth)))
+            (Some(AuthType::Basic), Some(general_purpose::STANDARD.encode(auth)))
         } else {
             (None, None)
         };
@@ -64,7 +64,7 @@ impl AuthBuilder {
 
 #[cfg(test)]
 mod tests {
-    use base64::encode;
+    use base64::{Engine as _, engine::general_purpose};
 
     use super::AuthBuilder;
 
@@ -82,7 +82,7 @@ mod tests {
         let pass = "12345678";
         let builder = AuthBuilder::new(None, Some(user), Some(pass));
         let auth_token = builder.get_auth();
-        let check = format!("Basic {}", encode("test:12345678"));
+        let check = format!("Basic {}", general_purpose::STANDARD.encode("test:12345678"));
         assert_eq!(check, auth_token.unwrap());
     }
 }
