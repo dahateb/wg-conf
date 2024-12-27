@@ -1,6 +1,6 @@
 [package]
 name = "wg-conf"
-version = "0.1.5"
+version = "0.2.0"
 authors = ["dan"]
 edition = "2021"
 
@@ -11,8 +11,9 @@ members = ["common", "crypto", "hooks"]
 
 [dependencies]
 ### -> tonic dependencies
-tonic = {version = "0.8", features = ["tls"]}
-prost = "0.11"
+tonic = {version = "0.12.3", features = ["tls"]}
+tonic-middleware = "0.2.3"
+prost = "0.13.4"
 tokio = { version = "1.0", features = ["rt-multi-thread", "time", "fs", "macros"] }
 tokio-stream = { version =  "0.1", features = ["net"] }
 async-stream = "0.3"
@@ -35,7 +36,7 @@ base64 = "0.22.1"
 tempfile = "3.2.0"
 
 [build-dependencies]
-tonic-build = { version = "0.8" }
+tonic-build = { version = "0.12.3" }
 
 [profile.release]
 lto = true

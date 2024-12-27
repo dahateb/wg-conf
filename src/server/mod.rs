@@ -1,13 +1,15 @@
-use auth::InterceptedService;
+use auth::{AuthInterceptor, AuthServiceImpl};
 use config::WireguardConfig;
 use hooks::RegistrationHooks;
 use registration::registration_server::{Registration, RegistrationServer};
 use registration::{RegisterReply, RegisterRequest};
+use std::sync::Arc;
 use tonic::Code;
 use tonic::{
     transport::{Identity, Server, ServerTlsConfig},
     Request, Response, Status,
 };
+use tonic_middleware::InterceptorFor;
 
 pub mod registration {
     tonic::include_proto!("registration");
@@ -128,11 +130,15 @@ pub async fn start_server(
 
     // TODO find out correct typing to avoid code duplication
     if auth_script.is_some() {
-        let service = InterceptedService::new(
-            RegistrationServer::new(registration),
-            auth_script.unwrap().to_string(),
-        );
-        server.add_service(service).serve(addr).await?;
+        let service = RegistrationServer::new(registration);
+        let auth_interceptor = AuthInterceptor {
+            auth_service: Arc::new(AuthServiceImpl::new(auth_script.unwrap().into())),
+        };
+
+        server
+            .add_service(InterceptorFor::new(service, auth_interceptor))
+            .serve(addr)
+            .await?;
     } else {
         server
             .add_service(RegistrationServer::new(registration))
