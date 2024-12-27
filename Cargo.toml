@@ -1,6 +1,6 @@
 [package]
 name = "wg-conf"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["dan"]
 edition = "2021"
 
@@ -29,8 +29,8 @@ crypto = { path = "crypto" }
 hooks = { path = "hooks" }
 common = { path = "common" }
 simple-error = "0.3.1"
-http = "0.2.7"
-hyper = "0.14"
+http = "1.2.0"
+hyper = "1.5.2"
 tower = { version = "0.5.2" }
 base64 = "0.22.1"
 tempfile = "3.2.0"
