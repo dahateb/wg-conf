@@ -39,6 +39,7 @@ jobs:
       - image: cimg/rust:1.83
     environment:
       TZ: "/usr/share/zoneinfo/Europe/Paris"
+      RUSTFLAGS: "-C target-feature=-crt-static"
     working_directory: /home/circleci/project
     steps:
       - checkout
@@ -49,20 +50,22 @@ jobs:
             sudo apt install -y protobuf-compiler
       - run:
           name: Install stable toolchain
-          command: rustup toolchain install stable
+          command: |
+            rustup target add x86_64-unknown-linux-musl 
+            rustup toolchain install stable
       - run:
           name: Stable Build
           command: |
             rustup run stable rustc --version --verbose
             rustup run stable cargo --version --verbose
-            rustup run stable cargo build --release
+            rustup run stable cargo build --release --target x86_64-unknown-linux-musl
       - persist_to_workspace:
           # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is 
           # taken to be the root directory of the workspace.
           root: /home/circleci/project
           # Must be relative path from root
           paths:
-            - target/release
+            - target/x86_64-unknown-linux-musl/release
   publish-github-release:
     docker:
       - image: cimg/go:1.23
@@ -73,8 +76,8 @@ jobs:
       - run:
           name: make file executable 
           command: |
-            ls -al /home/circleci/project/target/release
-            chmod +x /home/circleci/project/target/release/wg-conf
+            ls -al /home/circleci/project/target/x86_64-unknown-linux-musl/release
+            chmod +x /home/circleci/project/target/x86_64-unknown-linux-musl/release/wg-conf
       - run:
           name: "Publish Release on GitHub"
           command: |
