@@ -39,7 +39,7 @@ jobs:
       - image: cimg/rust:1.83
     environment:
       TZ: "/usr/share/zoneinfo/Europe/Paris"
-      RUSTFLAGS: "-C target-feature=-crt-static"
+      RUSTFLAGS: "-C target-feature=+crt-static"
     working_directory: /home/circleci/project
     steps:
       - checkout
