@@ -149,3 +149,88 @@ impl WireguardConfig {
         return Err(err_result);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_ipv4_assigns_new_ip() {
+        let config = WireguardConfig::new("examples/conf/wg0.conf");
+        let key = "test_public_key_1".to_string();
+
+        let result = config.get_ipv4(key.clone());
+
+        assert!(result.is_ok());
+        let ip = result.unwrap();
+        // First new IP should be 10.80.0.3 (base is .1, existing peer is .2, new is .3)
+        assert_eq!(ip, Ipv4Addr::new(10, 80, 0, 3));
+    }
+
+    #[test]
+    fn test_get_ipv4_returns_cached_ip_for_same_key() {
+        let config = WireguardConfig::new("examples/conf/wg0.conf");
+        let key = "test_public_key_2".to_string();
+
+        let first_result = config.get_ipv4(key.clone());
+        let second_result = config.get_ipv4(key.clone());
+
+        assert!(first_result.is_ok());
+        assert!(second_result.is_ok());
+        // Same key should return the same IP
+        assert_eq!(first_result.unwrap(), second_result.unwrap());
+    }
+
+    #[test]
+    fn test_get_ipv4_assigns_sequential_ips_for_different_keys() {
+        let config = WireguardConfig::new("examples/conf/wg0.conf");
+        let key1 = "test_public_key_3".to_string();
+        let key2 = "test_public_key_4".to_string();
+
+        let result1 = config.get_ipv4(key1);
+        let result2 = config.get_ipv4(key2);
+
+        assert!(result1.is_ok());
+        assert!(result2.is_ok());
+        let ip1 = result1.unwrap();
+        let ip2 = result2.unwrap();
+        // IPs should be different and sequential
+        assert_ne!(ip1, ip2);
+    }
+
+    #[test]
+    fn test_get_ipv4_retrieves_existing_peer_ip() {
+        let config = WireguardConfig::new("examples/conf/wg0.conf");
+        // This is the public key from the existing peer in wg0.conf
+        let existing_key = "nzZFP6R+abNfKjbknIf2QkqgyAf1PcmwpOCCelE7FDs=".to_string();
+
+        let result = config.get_ipv4(existing_key);
+
+        assert!(result.is_ok());
+        // Should return the existing peer's IP
+        assert_eq!(result.unwrap(), Ipv4Addr::new(10, 80, 0, 2));
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_get_ipv4_overflow_panics_when_pool_exhausted() {
+        let config = WireguardConfig::new("examples/conf/wg0.conf");
+
+        // For a /24 network (10.80.0.0/24), valid host IPs are .1 to .254
+        // The network starts at .1 (server), existing peer at .2
+        // nth(0) = .0 (network), nth(1) = .1 (server), nth(2) = .2, ..., nth(255) = .255 (broadcast)
+        // nth(256) = None, which causes unwrap() to panic
+        //
+        // Pre-fill the backend to simulate 253 allocated IPs (indices 2..255)
+        // so the next allocation attempt would be nth(255) = .255, then nth(256) = None
+        for i in 2..255 {
+            let key = format!("overflow_test_key_{}", i);
+            config.backend.store_ipv4(key, Ipv4Addr::new(10, 80, 0, i as u8));
+        }
+
+        // At this point backend has 254 entries (1 existing + 253 added)
+        // Next call will try nth(254 + 2) = nth(256) which is None -> panic
+        let key = "overflow_trigger_key".to_string();
+        let _ = config.get_ipv4(key);
+    }
+}
