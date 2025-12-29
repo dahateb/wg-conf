@@ -5,7 +5,7 @@ use std::str::FromStr;
 use std::sync::Arc;
 use tempfile::NamedTempFile;
 use tonic::codegen::http::Request;
-use tonic::{body::BoxBody, Status};
+use tonic::{body::Body, Status};
 use tonic_middleware::RequestInterceptor;
 
 use tonic::async_trait;
@@ -70,7 +70,7 @@ pub struct AuthInterceptor<A: AuthService> {
 
 #[async_trait]
 impl<A: AuthService> RequestInterceptor for AuthInterceptor<A> {
-    async fn intercept(&self, req: Request<BoxBody>) -> Result<Request<BoxBody>, Status> {
+    async fn intercept(&self, req: Request<Body>) -> Result<Request<Body>, Status> {
         match req.headers().get("authorization").map(|v| v.to_str()) {
             Some(Ok(token)) => {
                 let res = self.auth_service.verify_token(token).await;

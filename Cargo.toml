@@ -1,8 +1,8 @@
 [package]
 name = "wg-conf"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["dan"]
-edition = "2021"
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -11,9 +11,10 @@ members = ["common", "crypto", "hooks"]
 
 [dependencies]
 ### -> tonic dependencies
-tonic = {version = "0.12.3", features = ["tls"]}
-tonic-middleware = "0.2.3"
-prost = "0.13.4"
+tonic = {version = "0.14.2", features = ["_tls-any"]}
+tonic-middleware = "0.4.0"
+tonic-prost = "0.14.2"
+prost = "0.14.1"
 tokio = { version = "1.0", features = ["rt-multi-thread", "time", "fs", "macros"] }
 tokio-stream = { version =  "0.1", features = ["net"] }
 async-stream = "0.3"
@@ -23,7 +24,7 @@ clap = "2.34"
 log = "0.4"
 pretty_env_logger = "0.5.0"
 rust-ini = {git="https://github.com/dahateb/rust-ini"}
-ipnetwork = "0.20.0"
+ipnetwork = "0.21.1"
 url = "2.2.0"
 crypto = { path = "crypto" }
 hooks = { path = "hooks" }
@@ -36,7 +37,7 @@ base64 = "0.22.1"
 tempfile = "3.2.0"
 
 [build-dependencies]
-tonic-build = { version = "0.12.3" }
+tonic-prost-build = "0.14.2"
 
 [profile.release]
 lto = true
