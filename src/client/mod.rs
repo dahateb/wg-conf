@@ -1,10 +1,10 @@
 use self::config::{build_config_file, config_file_exists};
 use crate::crypto::{generate_key_pair, get_public_key};
-use auth::{interceptor, AuthBuilder};
+use auth::{AuthBuilder, interceptor};
 use ini::{Ini, ParseOption};
-use registration::registration_client::RegistrationClient;
 use registration::RegisterReply;
 use registration::RegisterRequest;
+use registration::registration_client::RegistrationClient;
 use std::str::FromStr;
 use tonic::transport::Uri;
 use tonic::transport::{Certificate, Channel, ClientTlsConfig};

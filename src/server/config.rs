@@ -1,6 +1,6 @@
 use crate::crypto::get_public_key;
-use crate::server::backend::memory::MemoryBackend;
 use crate::server::backend::StorageBackend;
+use crate::server::backend::memory::MemoryBackend;
 use ini::{Ini, ParseOption, Properties, SectionEntry};
 use ipnetwork::{Ipv4Network, Ipv6Network};
 use std::net::{Ipv4Addr, Ipv6Addr};
@@ -118,7 +118,9 @@ impl WireguardConfig {
             debug!("backend size: {}", ipv4_len);
             match net_option {
                 Ok(net) => {
-                    let next = net.nth(ipv4_len + 2).unwrap();
+                    let next = net.nth(ipv4_len + 2).ok_or_else(|| {
+                        format!("IPv4 address pool exhausted for network {}", addr.trim())
+                    })?;
                     self.backend.store_ipv4(key, next);
                     debug!("Network Size={}", net.size());
                     debug!("IP={}", net.ip());
@@ -212,25 +214,29 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
-    fn test_get_ipv4_overflow_panics_when_pool_exhausted() {
+    fn test_get_ipv4_returns_error_when_pool_exhausted() {
         let config = WireguardConfig::new("examples/conf/wg0.conf");
 
         // For a /24 network (10.80.0.0/24), valid host IPs are .1 to .254
         // The network starts at .1 (server), existing peer at .2
         // nth(0) = .0 (network), nth(1) = .1 (server), nth(2) = .2, ..., nth(255) = .255 (broadcast)
-        // nth(256) = None, which causes unwrap() to panic
+        // nth(256) = None, which causes an error to be returned
         //
         // Pre-fill the backend to simulate 253 allocated IPs (indices 2..255)
         // so the next allocation attempt would be nth(255) = .255, then nth(256) = None
         for i in 2..255 {
             let key = format!("overflow_test_key_{}", i);
-            config.backend.store_ipv4(key, Ipv4Addr::new(10, 80, 0, i as u8));
+            config
+                .backend
+                .store_ipv4(key, Ipv4Addr::new(10, 80, 0, i as u8));
         }
 
         // At this point backend has 254 entries (1 existing + 253 added)
-        // Next call will try nth(254 + 2) = nth(256) which is None -> panic
+        // Next call will try nth(254 + 2) = nth(256) which is None -> error
         let key = "overflow_trigger_key".to_string();
-        let _ = config.get_ipv4(key);
+        let result = config.get_ipv4(key);
+
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("IPv4 address pool exhausted"));
     }
 }

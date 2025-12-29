@@ -1,8 +1,8 @@
-use base64::{engine::general_purpose, Engine as _};
+use base64::{Engine as _, engine::general_purpose};
 use common::AuthType;
 use tonic::{
-    metadata::{Ascii, MetadataValue},
     Request, Status,
+    metadata::{Ascii, MetadataValue},
 };
 
 pub fn interceptor(
@@ -67,7 +67,7 @@ impl AuthBuilder {
 
 #[cfg(test)]
 mod tests {
-    use base64::{engine::general_purpose, Engine as _};
+    use base64::{Engine as _, engine::general_purpose};
 
     use super::AuthBuilder;
 

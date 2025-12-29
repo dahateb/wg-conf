@@ -6,8 +6,8 @@ use registration::{RegisterReply, RegisterRequest};
 use std::sync::Arc;
 use tonic::Code;
 use tonic::{
-    transport::{Identity, Server, ServerTlsConfig},
     Request, Response, Status,
+    transport::{Identity, Server, ServerTlsConfig},
 };
 use tonic_middleware::InterceptorFor;
 
