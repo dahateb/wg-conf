@@ -1,6 +1,6 @@
 [package]
 name = "wg-conf"
-version = "0.3.1"
+version = "0.3.2"
 authors = ["dan"]
 edition = "2024"
 
@@ -29,12 +29,12 @@ url = "2.2.0"
 crypto = { path = "crypto" }
 hooks = { path = "hooks" }
 common = { path = "common" }
-simple-error = "0.3.1"
-http = "1.2.0"
-hyper = "1.5.2"
+simple-error = "0.3.2"
+http = "1.4.0"
+hyper = "1.8.1"
 tower = { version = "0.5.2" }
 base64 = "0.22.1"
-tempfile = "3.2.0"
+tempfile = "3.24.0"
 
 [build-dependencies]
 tonic-prost-build = "0.14.2"
