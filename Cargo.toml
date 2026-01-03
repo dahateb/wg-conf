@@ -1,6 +1,6 @@
 [package]
 name = "wg-conf"
-version = "0.3.3"
+version = "0.3.4"
 authors = ["dan"]
 edition = "2024"
 
@@ -11,7 +11,7 @@ members = ["common", "crypto", "hooks"]
 
 [dependencies]
 ### -> tonic dependencies
-tonic = {version = "0.14.2", features = ["_tls-any"]}
+tonic = {version = "0.14.2", features = ["tls-ring"]}
 tonic-middleware = "0.4.0"
 tonic-prost = "0.14.2"
 prost = "0.14.1"
